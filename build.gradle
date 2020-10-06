@@ -1,0 +1,144 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'application'
+    id 'maven-publish'
+    id 'signing'
+    id 'nebula.release' version '13.0.0'
+}
+
+group 'org.contextmapper'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${jUnitVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:${jUnitVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}"
+}
+
+application {
+    mainClassName = 'org.contextmapper.cli.ContextMapperCLI'
+    applicationName = 'context-mapper-cli'
+}
+startScripts {
+    applicationName = 'cm'
+}
+
+if (!project.hasProperty('signing.secretKeyRingFile')) {
+    project.ext.'signing.secretKeyRingFile' = "${rootDir}/secret-key.gpg"
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        showExceptions true
+        exceptionFormat "full"
+
+        showCauses true
+        showStackTraces true
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
+}
+
+check.dependsOn jacocoTestReport
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "${project.name}"
+            groupId = "${project.group}"
+            version = "${project.version}"
+            from components.java
+            artifact javadocJar
+            artifact sourcesJar
+            artifact distZip
+            artifact distTar
+
+            pom {
+                name = 'Context Map Generator'
+                description = 'Context Mapper Command Line Interface (CLI)'
+                url = 'https://github.com/ContextMapper/context-mapper-cli'
+                organization {
+                    name = 'Context Mapper'
+                    url = 'https://contextmapper.org/'
+                }
+                licenses {
+                    license {
+                        name = 'Apache License 2.0'
+                        url = 'https://github.com/ContextMapper/context-mapper-cli/blob/master/LICENSE'
+                    }
+                }
+                issueManagement {
+                    system = 'GitHub'
+                    url = 'https://github.com/ContextMapper/context-mapper-cli/issues'
+                }
+                scm {
+                    url = 'https://github.com/ContextMapper/context-mapper-cli'
+                    connection = 'scm:git:git://github.com/ContextMapper/context-mapper-cli.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:ContextMapper/context-mapper-cli.git'
+                }
+                developers {
+                    developer {
+                        name = 'Stefan Kapferer'
+                        email = 'stefan@contextmapper.org'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            def releasesRepoUrl = "${ossReleaseStagingRepository}"
+            def snapshotsRepoUrl = "${ossSnapshotRepository}"
+            url = project.version.toString().endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            credentials {
+                username = System.getenv('OSSRH_USERNAME')
+                password = System.getenv('OSSRH_PASSWORD')
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
+tasks.withType(CreateStartScripts).each { task ->
+    task.doLast {
+        String text = task.windowsScript.text
+        text = text.replaceFirst(/(set CLASSPATH=%APP_HOME%\\lib\\).*/, { "${it[1]}*" })
+        task.windowsScript.write text
+    }
+}
