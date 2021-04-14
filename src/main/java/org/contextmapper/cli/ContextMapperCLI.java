@@ -39,7 +39,7 @@ public class ContextMapperCLI {
     }
 
     protected void run(String[] args) {
-        System.out.println("Context Mapper CLI");
+        System.out.println("Context Mapper CLI " + getVersion());
 
         if (args == null || args.length == 0) {
             printUsages();
@@ -52,6 +52,11 @@ public class ContextMapperCLI {
 
     private void printUsages() {
         System.out.println("Usage: cm " + COMPILE_COMMAND + "|" + GENERATE_COMMAND + " [options]");
+    }
+
+    private String getVersion() {
+        String implVersion = ContextMapperCLI.class.getPackage().getImplementationVersion();
+        return implVersion != null ? "v" + implVersion : "DEVELOPMENT VERSION";
     }
 
 }

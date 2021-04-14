@@ -69,7 +69,7 @@ class ContextMapperCLITest {
         ContextMapperCLI.main(params);
 
         // then
-        assertThat(outContent.toString()).isEqualTo("Context Mapper CLI" + System.lineSeparator() +
+        assertThat(outContent.toString()).isEqualTo("Context Mapper CLI DEVELOPMENT VERSION" + System.lineSeparator() +
                 "Usage: cm compile|generate [options]" + System.lineSeparator());
     }
 
@@ -82,7 +82,7 @@ class ContextMapperCLITest {
         contextMapperCLI.run(params);
 
         // then
-        assertThat(outContent.toString()).isEqualTo("Context Mapper CLI" + System.lineSeparator() +
+        assertThat(outContent.toString()).isEqualTo("Context Mapper CLI DEVELOPMENT VERSION" + System.lineSeparator() +
                 "Usage: cm compile|generate [options]" + System.lineSeparator());
     }
 

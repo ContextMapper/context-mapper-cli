@@ -35,6 +35,15 @@ application {
 startScripts {
     applicationName = 'cm'
 }
+jar {
+    manifest {
+        attributes (
+                'Implementation-Title': 'Context Mapper Command Line Interface (CLI)',
+                'Implementation-Version': project.version,
+                'Main-Class': 'org.contextmapper.cli.ContextMapperCLI'
+        )
+    }
+}
 
 if (!project.hasProperty('signing.secretKeyRingFile')) {
     project.ext.'signing.secretKeyRingFile' = "${rootDir}/secret-key.gpg"
