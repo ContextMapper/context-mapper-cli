@@ -1,6 +1,6 @@
 ![Context Mapper](https://raw.githubusercontent.com/wiki/ContextMapper/context-mapper-dsl/logo/cm-logo-github-small.png)
 # Context Mapper CLI
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build (master)](https://github.com/ContextMapper/context-mapper-cli/actions/workflows/build_master.yml/badge.svg)](https://github.com/ContextMapper/context-mapper-cli/actions) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 This repository contains the Context Mapper CLI - a command line interface to compile CML files and call generators
 (currently PlantUML, Context Map, and generic text files via Freemarker template).
