@@ -5,6 +5,27 @@
 This repository contains the Context Mapper CLI - a command line interface to compile CML files and call generators
 (currently PlantUML, Context Map, and generic text files via Freemarker template).
 
+## Download
+The CLI can be downloaded under the following links:
+ * [TAR](https://repo1.maven.org/maven2/org/contextmapper/context-mapper-cli/6.4.0/context-mapper-cli-6.4.0.tar) (Linux, Mac)
+ * [ZIP](https://repo1.maven.org/maven2/org/contextmapper/context-mapper-cli/6.4.0/context-mapper-cli-6.4.0.zip) (Windows)
+
+In case you want to include Context Mapper in your Maven or Gradle build, you can use the CLI to call generators (for example with Maven exec plugin).
+
+**Gradle:**
+```gradle
+implementation 'org.contextmapper:context-mapper-cli:6.4.0'
+```
+
+**Maven:**
+```xml
+<dependency>
+  <groupId>org.contextmapper</groupId>
+  <artifactId>context-mapper-cli</artifactId>
+  <version>6.4.0</version>
+</dependency>
+```
+
 ## Compile Command Usage
 ```shell
 $ ./cm compile -h
