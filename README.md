@@ -90,7 +90,7 @@ If you want to contribute to this project you can create a fork and a pull reque
 
 ## Contributing
 Contribution is always welcome! Here are some ways how you can contribute:
-* Create Github issues if you find bugs or just want to give suggestions for improvements.
+* Create GitHub issues if you find bugs or just want to give suggestions for improvements.
 * This is an open source project: if you want to code, [create pull requests](https://help.github.com/articles/creating-a-pull-request/) from [forks of this repository](https://help.github.com/articles/fork-a-repo/). Please refer to a Github issue if you contribute this way.
 * If you want to contribute to our documentation and user guides on our website [https://contextmapper.org/](https://contextmapper.org/), create pull requests from forks of the corresponding page repo [https://github.com/ContextMapper/contextmapper.github.io](https://github.com/ContextMapper/contextmapper.github.io) or create issues [there](https://github.com/ContextMapper/contextmapper.github.io/issues).
 
