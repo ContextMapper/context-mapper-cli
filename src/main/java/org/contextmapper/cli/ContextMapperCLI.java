@@ -47,6 +47,9 @@ public class ContextMapperCLI {
             compileCommand.run(Arrays.copyOfRange(args, 1, args.length));
         } else if (GENERATE_COMMAND.equalsIgnoreCase(args[0])) {
             generateCommand.run(Arrays.copyOfRange(args, 1, args.length));
+        } else {
+            System.out.println("Invalid input");
+            System.exit(127);
         }
     }
 
