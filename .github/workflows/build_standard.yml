@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-18.04
-    
+
     steps:
     - uses: actions/checkout@v2
       with:
@@ -20,7 +20,7 @@ jobs:
         java-version: 11
     - name: Install Graphviz
       run: sudo apt-get -y install graphviz
-    - name: Gradle caches  
+    - name: Gradle caches
       uses: actions/cache@v2
       with:
         path: |
@@ -35,4 +35,3 @@ jobs:
       run: ./gradlew clean build snapshot
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
-
