@@ -10,7 +10,7 @@ on:
 jobs:
   build_and_publish_snapshot:
     runs-on: ubuntu-18.04
-    
+
     steps:
     - uses: actions/checkout@v2
       with:
@@ -48,4 +48,3 @@ jobs:
         OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
-

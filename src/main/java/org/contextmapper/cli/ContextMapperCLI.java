@@ -20,9 +20,12 @@ import org.contextmapper.cli.commands.GenerateCommand;
 import org.contextmapper.cli.commands.ValidateCommand;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class ContextMapperCLI {
 
+    private static final List<String> REQUIRED_JAVA_VERSIONS = Collections.unmodifiableList(Arrays.asList("1.8", "11"));
     private static final String VALIDATE_COMMAND = "validate";
     private static final String GENERATE_COMMAND = "generate";
 
@@ -35,7 +38,14 @@ public class ContextMapperCLI {
     }
 
     public static void main(String[] args) {
-        new ContextMapperCLI().run(args);
+        String javaVersion = System.getProperty("java.version");
+
+        if (REQUIRED_JAVA_VERSIONS.stream().anyMatch(javaVersion::startsWith)) {
+            new ContextMapperCLI().run(args);
+        } else {
+            System.out.printf("Invalid Java version '%s', please set JAVA_HOME to major version '%s'%n", javaVersion, String.join("' or '", REQUIRED_JAVA_VERSIONS));
+            System.exit(1);
+        }
     }
 
     protected void run(String[] args) {
@@ -47,6 +57,9 @@ public class ContextMapperCLI {
             validateCommand.run(Arrays.copyOfRange(args, 1, args.length));
         } else if (GENERATE_COMMAND.equalsIgnoreCase(args[0])) {
             generateCommand.run(Arrays.copyOfRange(args, 1, args.length));
+        } else {
+            System.out.println("Invalid input");
+            System.exit(127);
         }
     }
 

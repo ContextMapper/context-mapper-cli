@@ -80,8 +80,8 @@ public class GenerateCommand extends AbstractCliCommand {
         options.addOption(input);
 
         Option generator = new Option("g", "generator", true,
-                "The generator you want to call. Use one of the following values: " + String.join(", ", Arrays
-                        .asList(ContextMapperGenerator.values()).stream().map(g -> g.toString()).collect(Collectors.toList())));
+                "The generator you want to call. Use one of the following values: " +
+                        Arrays.stream(ContextMapperGenerator.values()).map(ContextMapperGenerator::toString).collect(Collectors.joining(", ")));
         generator.setRequired(true);
         options.addOption(generator);
 
