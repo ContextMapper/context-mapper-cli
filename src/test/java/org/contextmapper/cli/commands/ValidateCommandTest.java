@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CompileCommandTest {
+class ValidateCommandTest {
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
@@ -53,7 +53,7 @@ class CompileCommandTest {
     @ValueSource(strings = {"-h", "--help", "-i some-file.cml -h", "-i some-file.cml --help"})
     void run_WhenCalledWithHelp_ThenPrintHelp(final String params) {
         // given
-        final CompileCommand command = spy(new CompileCommand());
+        final ValidateCommand command = spy(new ValidateCommand());
 
         // when
         command.run(params.split(" "));
@@ -63,22 +63,22 @@ class CompileCommandTest {
     }
 
     @Test
-    void run_WhenWithValidCMLFile_ThenCompileWithoutErrors() {
+    void run_WhenWithValidCMLFile_ThenValidateWithoutErrors() {
         // given
-        final CompileCommand command = spy(new CompileCommand());
+        final ValidateCommand command = spy(new ValidateCommand());
 
         // when
         command.run(new String[]{"-i src/test/resources/test.cml"});
 
         // then
         verify(command).printValidationMessages(any(), any());
-        assertThat(outContent.toString()).contains("The CML file 'src/test/resources/test.cml' has been compiled without errors.");
+        assertThat(outContent.toString()).contains("The CML file 'src/test/resources/test.cml' has been validated without errors.");
     }
 
     @Test
     void run_WhenWithInvalidCMLFile_ThenPrintError() {
         // given
-        final CompileCommand command = spy(new CompileCommand());
+        final ValidateCommand command = spy(new ValidateCommand());
 
         // when
         command.run(new String[]{"-i src/test/resources/test-with-error.cml"});

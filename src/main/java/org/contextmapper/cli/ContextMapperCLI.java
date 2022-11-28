@@ -16,8 +16,8 @@
 package org.contextmapper.cli;
 
 import org.contextmapper.cli.commands.CliCommand;
-import org.contextmapper.cli.commands.CompileCommand;
 import org.contextmapper.cli.commands.GenerateCommand;
+import org.contextmapper.cli.commands.ValidateCommand;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,16 +26,15 @@ import java.util.List;
 public class ContextMapperCLI {
 
     private static final List<String> REQUIRED_JAVA_VERSIONS = Collections.unmodifiableList(Arrays.asList("1.8", "11"));
-
-    private static final String COMPILE_COMMAND = "compile";
+    private static final String VALIDATE_COMMAND = "validate";
     private static final String GENERATE_COMMAND = "generate";
 
     private CliCommand generateCommand;
-    private CliCommand compileCommand;
+    private CliCommand validateCommand;
 
     public ContextMapperCLI() {
         this.generateCommand = new GenerateCommand();
-        this.compileCommand = new CompileCommand();
+        this.validateCommand = new ValidateCommand();
     }
 
     public static void main(String[] args) {
@@ -54,8 +53,8 @@ public class ContextMapperCLI {
 
         if (args == null || args.length == 0) {
             printUsages();
-        } else if (COMPILE_COMMAND.equalsIgnoreCase(args[0])) {
-            compileCommand.run(Arrays.copyOfRange(args, 1, args.length));
+        } else if (VALIDATE_COMMAND.equalsIgnoreCase(args[0])) {
+            validateCommand.run(Arrays.copyOfRange(args, 1, args.length));
         } else if (GENERATE_COMMAND.equalsIgnoreCase(args[0])) {
             generateCommand.run(Arrays.copyOfRange(args, 1, args.length));
         } else {
@@ -65,7 +64,7 @@ public class ContextMapperCLI {
     }
 
     private void printUsages() {
-        System.out.println("Usage: cm " + COMPILE_COMMAND + "|" + GENERATE_COMMAND + " [options]");
+        System.out.println("Usage: cm " + VALIDATE_COMMAND + "|" + GENERATE_COMMAND + " [options]");
     }
 
     private String getVersion() {
