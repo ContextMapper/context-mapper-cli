@@ -15,8 +15,8 @@
  */
 package org.contextmapper.cli;
 
-import org.contextmapper.cli.commands.CompileCommand;
 import org.contextmapper.cli.commands.GenerateCommand;
+import org.contextmapper.cli.commands.ValidateCommand;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class ContextMapperCLITest {
     private final PrintStream originalErr = System.err;
 
     @Mock
-    private CompileCommand compileCommand;
+    private ValidateCommand validateCommand;
 
     @Mock
     private GenerateCommand generateCommand;
@@ -70,7 +70,7 @@ class ContextMapperCLITest {
 
         // then
         assertThat(outContent.toString()).isEqualTo("Context Mapper CLI DEVELOPMENT VERSION" + System.lineSeparator() +
-                "Usage: cm compile|generate [options]" + System.lineSeparator());
+                "Usage: cm validate|generate [options]" + System.lineSeparator());
     }
 
     @Test
@@ -83,31 +83,31 @@ class ContextMapperCLITest {
 
         // then
         assertThat(outContent.toString()).isEqualTo("Context Mapper CLI DEVELOPMENT VERSION" + System.lineSeparator() +
-                "Usage: cm compile|generate [options]" + System.lineSeparator());
+                "Usage: cm validate|generate [options]" + System.lineSeparator());
     }
 
     @Test
-    void run_WhenCalledWithCompile_ThenCallCompileCommand() {
+    void run_WhenCalledWithValidate_ThenCallValidateCommand() {
         // given
-        final String[] params = new String[]{"compile"};
+        final String[] params = new String[]{"validate"};
 
         // when
         contextMapperCLI.run(params);
 
         // then
-        verify(compileCommand).run(new String[]{});
+        verify(validateCommand).run(new String[]{});
     }
 
     @Test
-    void run_WhenCalledWithCompileAndAdditionalParams_ThenCallCompileCommandWithParams() {
+    void run_WhenCalledWithValidateAndAdditionalParams_ThenCallValidateCommandWithParams() {
         // given
-        final String[] params = new String[]{"compile", "test-param"};
+        final String[] params = new String[]{"validate", "test-param"};
 
         // when
         contextMapperCLI.run(params);
 
         // then
-        verify(compileCommand).run(new String[]{"test-param"});
+        verify(validateCommand).run(new String[]{"test-param"});
     }
 
     @Test

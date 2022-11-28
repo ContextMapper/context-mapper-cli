@@ -2,7 +2,7 @@
 # Context Mapper CLI
 [![Build (master)](https://github.com/ContextMapper/context-mapper-cli/actions/workflows/build_master.yml/badge.svg)](https://github.com/ContextMapper/context-mapper-cli/actions) [![codecov](https://codecov.io/gh/ContextMapper/context-mapper-cli/branch/master/graph/badge.svg?token=OMqxkddZOJ)](https://codecov.io/gh/ContextMapper/context-mapper-cli) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Maven Central](https://img.shields.io/maven-central/v/org.contextmapper/context-mapper-cli.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.contextmapper%22%20AND%20a:%22context-mapper-cli%22)
 
-This repository contains the Context Mapper CLI - a command line interface to compile CML files and call generators
+This repository contains the Context Mapper CLI - a command line interface to validate CML files and call generators
 (currently PlantUML, Context Map, and generic text files via Freemarker template).
 
 ## Download
@@ -26,13 +26,13 @@ implementation 'org.contextmapper:context-mapper-cli:6.6.1'
 </dependency>
 ```
 
-## Compile Command Usage
+## Validate Command Usage
 ```shell
-$ ./cm compile -h
+$ ./cm validate -h
 Context Mapper CLI
-usage: cm compile
+usage: cm validate
  -h,--help          Prints this message.
- -i,--input <arg>   Path to the CML file which you want to compile.
+ -i,--input <arg>   Path to the CML file which you want to validate.
 ```
 
 ## Generate Command Usage
@@ -61,10 +61,10 @@ usage: cm generate
 ## Usage examples
 The following examples illustrate the CLI usage.
 
-### Compile/Validate *.cml File
+### Validate *.cml File
 
 ```shell
-./cm compile -i DDD-Sample.cml
+./cm validate -i DDD-Sample.cml
 ```
 
 ### Generate PlantUML

@@ -21,7 +21,7 @@ import org.contextmapper.dsl.standalone.ContextMapperStandaloneSetup;
 import org.contextmapper.dsl.standalone.StandaloneContextMapperAPI;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 
-public class CompileCommand extends AbstractCliCommand {
+public class ValidateCommand extends AbstractCliCommand {
 
     @Override
     public void run(String[] args) {
@@ -58,7 +58,7 @@ public class CompileCommand extends AbstractCliCommand {
         Option help = new Option("h", "help", false, "Prints this message.");
         options.addOption(help);
 
-        Option input = new Option("i", "input", true, "Path to the CML file which you want to compile.");
+        Option input = new Option("i", "input", true, "Path to the CML file which you want to validate.");
         input.setRequired(true);
         options.addOption(input);
 
@@ -67,7 +67,7 @@ public class CompileCommand extends AbstractCliCommand {
 
     protected void printValidationMessages(final CMLResource cmlResource, final String filePath) {
         if (cmlResource.getErrors().isEmpty()) {
-            System.out.println("The CML file '" + filePath + "' has been compiled without errors.");
+            System.out.println("The CML file '" + filePath + "' has been validated without errors.");
         } else {
             for (Diagnostic diagnostic : cmlResource.getErrors()) {
                 System.out.println("ERROR in " + diagnostic.getLocation() + " on line " + diagnostic.getLine() + ":"
@@ -82,7 +82,7 @@ public class CompileCommand extends AbstractCliCommand {
     }
 
     protected void printHelp(final Options options) {
-        new HelpFormatter().printHelp("cm compile", options);
+        new HelpFormatter().printHelp("cm validate", options);
     }
 
 }
