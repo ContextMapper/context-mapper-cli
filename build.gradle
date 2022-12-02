@@ -9,8 +9,8 @@ plugins {
 
 group 'org.contextmapper'
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 repositories {
     mavenCentral()
@@ -143,7 +143,7 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.mavenJava
+    sign(publishing.publications)
 }
 
 tasks.withType(GenerateModuleMetadata) {

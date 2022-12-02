@@ -25,7 +25,7 @@ import java.util.List;
 
 public class ContextMapperCLI {
 
-    private static final List<String> REQUIRED_JAVA_VERSIONS = Collections.unmodifiableList(Arrays.asList("1.8", "11"));
+    private static final List<String> REQUIRED_JAVA_VERSIONS = Collections.unmodifiableList(Arrays.asList("11", "17"));
     private static final String VALIDATE_COMMAND = "validate";
     private static final String GENERATE_COMMAND = "generate";
 
