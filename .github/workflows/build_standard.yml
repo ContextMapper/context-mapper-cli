@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -45,7 +45,7 @@ jobs:
         if-no-files-found: error
 
   validate_java_8:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     needs:
       - build
 
@@ -65,7 +65,7 @@ jobs:
         run: ./out/bin/cm
 
   validate_java_11:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     needs:
       - build
 
@@ -85,7 +85,7 @@ jobs:
         run: ./out/bin/cm
 
   validate_java_17:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     needs:
       - build
 
