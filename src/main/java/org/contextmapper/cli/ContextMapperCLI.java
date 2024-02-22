@@ -43,7 +43,6 @@ public class ContextMapperCLI {
         if (Runtime.version().feature() >= REQUIRED_JAVA_VERSION) {
             new ContextMapperCLI().run(args);
         } else {
-            System.out.println("");
             System.out.printf("Invalid Java version '%s' (>=%s is required).", javaVersion, REQUIRED_JAVA_VERSION);
             System.exit(1);
         }
