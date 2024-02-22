@@ -25,7 +25,7 @@ import java.util.List;
 
 public class ContextMapperCLI {
 
-    private static final List<String> REQUIRED_JAVA_VERSIONS = Collections.unmodifiableList(Arrays.asList("11", "17"));
+    private static final int REQUIRED_JAVA_VERSION = 11;
     private static final String VALIDATE_COMMAND = "validate";
     private static final String GENERATE_COMMAND = "generate";
 
@@ -38,12 +38,12 @@ public class ContextMapperCLI {
     }
 
     public static void main(String[] args) {
-        String javaVersion = System.getProperty("java.version");
+        int javaVersion = Runtime.version().feature();
 
-        if (REQUIRED_JAVA_VERSIONS.stream().anyMatch(javaVersion::startsWith)) {
+        if (Runtime.version().feature() >= REQUIRED_JAVA_VERSION) {
             new ContextMapperCLI().run(args);
         } else {
-            System.out.printf("Invalid Java version '%s', please set JAVA_HOME to major version '%s'%n", javaVersion, String.join("' or '", REQUIRED_JAVA_VERSIONS));
+            System.out.printf("Invalid Java version '%s' (>=%s is required).", javaVersion, REQUIRED_JAVA_VERSION);
             System.exit(1);
         }
     }
