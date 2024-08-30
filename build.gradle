@@ -4,7 +4,7 @@ plugins {
     id 'application'
     id 'maven-publish'
     id 'signing'
-    id 'nebula.release' version '13.0.0'
+    id 'nebula.release' version '19.0.10'
 }
 
 group 'org.contextmapper'

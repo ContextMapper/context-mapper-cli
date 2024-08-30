@@ -7,14 +7,14 @@ This repository contains the Context Mapper CLI - a command line interface to va
 
 ## Download
 The CLI can be downloaded under the following links:
- * [TAR](https://repo1.maven.org/maven2/org/contextmapper/context-mapper-cli/6.11.1/context-mapper-cli-6.11.1.tar) (Linux, Mac)
- * [ZIP](https://repo1.maven.org/maven2/org/contextmapper/context-mapper-cli/6.11.1/context-mapper-cli-6.11.1.zip) (Windows)
+ * [TAR](https://repo1.maven.org/maven2/org/contextmapper/context-mapper-cli/6.12.0/context-mapper-cli-6.12.0.tar) (Linux, Mac)
+ * [ZIP](https://repo1.maven.org/maven2/org/contextmapper/context-mapper-cli/6.12.0/context-mapper-cli-6.12.0.zip) (Windows)
 
 In case you want to include Context Mapper in your Maven or Gradle build, you can use the CLI to call generators (for example with Maven exec plugin).
 
 **Gradle:**
 ```gradle
-implementation 'org.contextmapper:context-mapper-cli:6.11.1'
+implementation 'org.contextmapper:context-mapper-cli:6.12.0'
 ```
 
 **Maven:**
@@ -22,7 +22,7 @@ implementation 'org.contextmapper:context-mapper-cli:6.11.1'
 <dependency>
   <groupId>org.contextmapper</groupId>
   <artifactId>context-mapper-cli</artifactId>
-  <version>6.11.1</version>
+  <version>6.12.0</version>
 </dependency>
 ```
 
