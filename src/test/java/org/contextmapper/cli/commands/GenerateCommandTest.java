@@ -138,6 +138,22 @@ class GenerateCommandTest {
     }
 
     @Test
+    void run_WhenCalledWithFileContainingImports_ThenGenerateFilesWithImportedContexts() throws IOException {
+        // given
+        final GenerateCommand command = spy(new GenerateCommand());
+        new File("build/test-out").mkdir();
+
+        // when
+        command.run(new String[]{"-i", "src/test/resources/test-with-imports.cml", "-g", "context-map", "-o", "build/test-out"});
+
+        // then
+        assertThat(outContent.toString()).contains("Generated into 'build/test-out'.");
+        assertThat(new File("build/test-out/test-with-imports_ContextMap.gv").exists()).isTrue();
+        assertThat(new File("build/test-out/test-with-imports_ContextMap.png").exists()).isTrue();
+        assertThat(new File("build/test-out/test-with-imports_ContextMap.svg").exists()).isTrue();
+    }
+
+    @Test
     void run_WhenCalledWithGenericParam_ThenGenerateGenericOutput() {
         // given
         final GenerateCommand command = spy(new GenerateCommand());

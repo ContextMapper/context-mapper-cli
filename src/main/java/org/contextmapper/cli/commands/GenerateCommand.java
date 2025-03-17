@@ -21,6 +21,7 @@ import org.contextmapper.dsl.generator.GenericContentGenerator;
 import org.contextmapper.dsl.standalone.ContextMapperStandaloneSetup;
 import org.contextmapper.dsl.standalone.StandaloneContextMapperAPI;
 import org.eclipse.xtext.generator.IGenerator2;
+import org.contextmapper.dsl.cml.CMLImportResolver;
 
 import java.io.File;
 import java.util.Arrays;
@@ -51,7 +52,12 @@ public class GenerateCommand extends AbstractCliCommand {
 
                 if (doesOutputDirExist(this.outputDir)) {
                     StandaloneContextMapperAPI cmAPI = ContextMapperStandaloneSetup.getStandaloneAPI();
-                    CMLResource cmlResource = cmAPI.loadCML(inputPath);
+                    File inputFile = new File(inputPath).getAbsoluteFile();
+                    CMLResource cmlResource = cmAPI.loadCML(inputFile);
+                    
+                    // Ensure imports are resolved before generation
+                    new CMLImportResolver().resolveImportedResources(cmlResource);
+                    
                     cmAPI.callGenerator(cmlResource, getGenerator(cmd), this.outputDir);
                     System.out.println("Generated into '" + this.outputDir + "'.");
                 }
