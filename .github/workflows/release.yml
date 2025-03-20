@@ -20,7 +20,7 @@ jobs:
     - name: Install Graphviz
       run: sudo apt-get -y install graphviz
     - name: Gradle caches
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           ~/.gradle/caches
@@ -45,4 +45,4 @@ jobs:
         OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v4
