@@ -34,7 +34,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew clean build snapshot
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v4
     - name: Unpack tar
       run: mkdir ./out && tar -xf ./build/distributions/*.tar --strip-components 1 -C ./out
     - name: Upload build
