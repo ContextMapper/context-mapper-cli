@@ -88,4 +88,17 @@ class ValidateCommandTest {
         assertThat(outContent.toString()).contains("ERROR in null on line 2:mismatched input '<EOF>' expecting RULE_CLOSE");
     }
 
+    @Test
+    void run_WhenWithFileContainingImports_ThenValidateWithoutErrors() {
+        // given
+        final ValidateCommand command = spy(new ValidateCommand());
+
+        // when
+        command.run(new String[]{"-i src/test/resources/test-with-imports.cml"});
+
+        // then
+        verify(command).printValidationMessages(any(), any());
+        assertThat(outContent.toString()).contains("The CML file 'src/test/resources/test-with-imports.cml' has been validated without errors.");
+    }
+
 }

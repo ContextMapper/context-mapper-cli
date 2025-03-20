@@ -1,0 +1,8 @@
+/* Import other contexts */
+import "./other-contexts.cml"
+
+/* Define a simple context map */
+ContextMap SimpleMap {
+  contains anotherContext
+  contains yetAnotherContext
+} 
