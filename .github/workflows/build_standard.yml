@@ -38,7 +38,7 @@ jobs:
     - name: Unpack tar
       run: mkdir ./out && tar -xf ./build/distributions/*.tar --strip-components 1 -C ./out
     - name: Upload build
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: build
         path: ./out
@@ -50,7 +50,7 @@ jobs:
       - build
     steps:
       - name: Download build
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: ./out
@@ -69,7 +69,7 @@ jobs:
       - build
     steps:
       - name: Download build
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: ./out
@@ -88,7 +88,7 @@ jobs:
       - build
     steps:
       - name: Download build
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: ./out
