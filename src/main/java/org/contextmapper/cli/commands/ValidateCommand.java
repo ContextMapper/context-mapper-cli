@@ -15,54 +15,47 @@
  */
 package org.contextmapper.cli.commands;
 
-import org.apache.commons.cli.*;
 import org.contextmapper.dsl.cml.CMLResource;
 import org.contextmapper.dsl.standalone.ContextMapperStandaloneSetup;
 import org.contextmapper.dsl.standalone.StandaloneContextMapperAPI;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
-public class ValidateCommand extends AbstractCliCommand {
+import java.io.File;
+import java.util.concurrent.Callable;
+
+@Command(name = "validate", description = "Validates a CML file.", mixinStandardHelpOptions = true)
+public class ValidateCommand implements Callable<Integer> {
+
+    @Option(names = {"-i", "--input"}, description = "Path to the CML file which you want to validate.", required = true)
+    private String inputPath;
 
     @Override
-    public void run(String[] args) {
-        Options options = createOptions();
-
-        CommandLineParser commandLineParser = new DefaultParser();
-
-        try {
-            CommandLine cmd = commandLineParser.parse(options, args);
-
-            if (cmd.hasOption("help") || cmd.hasOption("h")) {
-                printHelp(options);
-            } else {
-                // check that input CML files exists
-                String inputPath = cmd.getOptionValue("input").trim();
-                if (!isInputFileValid(inputPath))
-                    return;
-
-                // load CML file
-                StandaloneContextMapperAPI cmAPI = ContextMapperStandaloneSetup.getStandaloneAPI();
-                CMLResource cmlResource = cmAPI.loadCML(inputPath);
-
-                // print validation errors/warnings
-                printValidationMessages(cmlResource, inputPath);
-            }
-        } catch (ParseException e) {
-            printHelp(options);
+    public Integer call() throws Exception {
+        if (!isInputFileValid(inputPath)) {
+            return 1;
         }
+
+        StandaloneContextMapperAPI cmAPI = ContextMapperStandaloneSetup.getStandaloneAPI();
+        CMLResource cmlResource = cmAPI.loadCML(inputPath);
+
+        printValidationMessages(cmlResource, inputPath);
+
+        return cmlResource.getErrors().isEmpty() ? 0 : 1;
     }
 
-    private Options createOptions() {
-        Options options = new Options();
-
-        Option help = new Option("h", "help", false, "Prints this message.");
-        options.addOption(help);
-
-        Option input = new Option("i", "input", true, "Path to the CML file which you want to validate.");
-        input.setRequired(true);
-        options.addOption(input);
-
-        return options;
+    protected boolean isInputFileValid(String path) {
+        File inputFile = new File(path);
+        if (!inputFile.exists()) {
+            System.err.println("ERROR: The file '" + path + "' does not exist.");
+            return false;
+        }
+        if (!path.endsWith(".cml")) {
+            System.err.println("ERROR: Please provide a path to a CML (*.cml) file.");
+            return false;
+        }
+        return true;
     }
 
     protected void printValidationMessages(final CMLResource cmlResource, final String filePath) {
@@ -70,19 +63,12 @@ public class ValidateCommand extends AbstractCliCommand {
             System.out.println("The CML file '" + filePath + "' has been validated without errors.");
         } else {
             for (Diagnostic diagnostic : cmlResource.getErrors()) {
-                System.out.println("ERROR in " + diagnostic.getLocation() + " on line " + diagnostic.getLine() + ":"
-                        + diagnostic.getMessage());
+                System.err.println("ERROR in " + diagnostic.getLocation() + " on line " + diagnostic.getLine() + ":" + diagnostic.getMessage());
             }
         }
 
         for (Diagnostic diagnostic : cmlResource.getWarnings()) {
-            System.out.println("WARNING in " + diagnostic.getLocation() + " on line " + diagnostic.getLine() + ":"
-                    + diagnostic.getMessage());
+            System.out.println("WARNING in " + diagnostic.getLocation() + " on line " + diagnostic.getLine() + ":" + diagnostic.getMessage());
         }
     }
-
-    protected void printHelp(final Options options) {
-        new HelpFormatter().printHelp("cm validate", options);
-    }
-
 }

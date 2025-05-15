@@ -1,27 +1,12 @@
-/*
- * Copyright 2021 The Context Mapper Project Team
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.contextmapper.cli.commands;
 
+import org.contextmapper.cli.ContextMapperCLI;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.io.TempDir;
+import picocli.CommandLine;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,126 +14,178 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class GenerateCommandTest {
 
-    private static final String TEST_OUT_DIR = "build/test-out";
+    @TempDir
+    Path testOutPath;
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
     private final PrintStream originalErr = System.err;
 
-    private File testOutDir;
+    private CommandLine cmd;
+    private String testOutDirString;
 
     @BeforeEach
-    public void setUpStreams() throws IOException {
-        testOutDir = new File(TEST_OUT_DIR);
-        if (testOutDir.exists()) {
-            Files.walk(testOutDir.toPath())
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
+    void setUp() throws IOException {
+        testOutDirString = testOutPath.toFile().getAbsolutePath();
+        if (!Files.exists(testOutPath)) {
+            Files.createDirectories(testOutPath);
         }
-        testOutDir.mkdir();
 
         System.setOut(new PrintStream(outContent));
         System.setErr(new PrintStream(errContent));
+        cmd = new CommandLine(new ContextMapperCLI());
     }
 
     @AfterEach
-    public void restoreStreams() {
+    void restoreStreams() {
         System.setOut(originalOut);
         System.setErr(originalErr);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"-h", "--help", "-i some-file.cml -g plantuml -h", "-i some-file.cml -g plantuml --help"})
-    void run_WhenCalledWithHelp_ThenPrintHelp(final String params) {
-        // given
-        final GenerateCommand command = spy(new GenerateCommand());
+    @Test
+    @DisplayName("run() should print help when called with -h option")
+    void run_WhenCalledWithHelp_ThenPrintHelp() {
+        // Given
+        String[] args = {"generate", "-h"};
 
-        // when
-        command.run(params.split(" "));
+        // When
+        int exitCode = cmd.execute(args);
 
-        // then
-        verify(command).printHelp(any());
+        // Then
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(outContent.toString())
+            .contains("Usage: cm generate [-hV] [-f=<outputFileName>] -g=<generatorType>")
+            .contains("Generates output from a CML file.");
     }
 
     @Test
+    @DisplayName("run() should print error when output directory does not exist")
     void run_WhenCalledWithNonExistingOutDir_ThenPrintError() {
-        // given
-        final GenerateCommand command = spy(new GenerateCommand());
+        // Given
+        String nonExistingDir = "/just-some-dir-that-hopefully-not-exists-unless-you-are-very-unlucky";
+        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "plantuml", "-o", nonExistingDir};
 
-        // when
-        command.run(new String[]{"-i", "src/test/resources/test.cml", "-g", "plantuml", "-o", "/just-some-dir-that-hopefully-not-exists"});
+        // When
+        int exitCode = cmd.execute(args);
 
-        // then
-        assertThat(outContent.toString()).contains("ERROR: '/just-some-dir-that-hopefully-not-exists' is not a directory.");
+        // Then
+        assertThat(exitCode).isEqualTo(1);
+        assertThat(errContent.toString()).contains("ERROR: Output directory '" + nonExistingDir + "' does not exist.");
     }
 
     @Test
+    @DisplayName("run() should print error when input CML file does not exist")
     void run_WhenCalledWithNonExistingInputFile_ThenPrintError() {
-        // given
-        final GenerateCommand command = spy(new GenerateCommand());
+        // Given
+        String nonExistingFile = "just-a-file-that-does-not-exist.cml";
+        String[] args = {"generate", "-i", nonExistingFile, "-g", "plantuml", "-o", testOutDirString};
 
-        // when
-        command.run(new String[]{"-i", "just-a-file.cml", "-g", "plantuml", "-o", "/build"});
+        // When
+        int exitCode = cmd.execute(args);
 
-        // then
-        assertThat(outContent.toString()).contains("ERROR: The file 'just-a-file.cml' does not exist.");
+        // Then
+        assertThat(exitCode).isEqualTo(1);
+        assertThat(errContent.toString()).contains("ERROR: The file '" + nonExistingFile + "' does not exist.");
     }
 
     @Test
+    @DisplayName("run() should generate PlantUML files when plantuml generator is specified")
     void run_WhenCalledWithPlantUMLParam_ThenGeneratePlantUMLFiles() {
-        // given
-        final GenerateCommand command = spy(new GenerateCommand());
-        new File("build/test-out").mkdir();
+        // Given
+        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "plantuml", "-o", testOutDirString};
 
-        // when
-        command.run(new String[]{"-i", "src/test/resources/test.cml", "-g", "plantuml", "-o", "build/test-out"});
+        // When
+        int exitCode = cmd.execute(args);
 
-        // then
-        assertThat(outContent.toString()).contains("Generated into 'build/test-out'.");
-        assertThat(new File("build/test-out/test_BC_CargoBookingContext.puml").exists()).isTrue();
-        assertThat(new File("build/test-out/test_BC_LocationContext.puml").exists()).isTrue();
-        assertThat(new File("build/test-out/test_BC_VoyagePlanningContext.puml").exists()).isTrue();
-        assertThat(new File("build/test-out/test_ContextMap.puml").exists()).isTrue();
+        // Then
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(outContent.toString()).contains("Generated into '" + testOutDirString + "'.");
+        assertThat(new File(testOutDirString, "test_BC_CargoBookingContext.puml")).exists();
+        assertThat(new File(testOutDirString, "test_BC_LocationContext.puml")).exists();
+        assertThat(new File(testOutDirString, "test_BC_VoyagePlanningContext.puml")).exists();
+        assertThat(new File(testOutDirString, "test_ContextMap.puml")).exists();
     }
 
     @Test
+    @DisplayName("run() should generate Context Map files when context-map generator is specified")
     void run_WhenCalledWithContextMapParam_ThenGenerateContextMapFiles() {
-        // given
-        final GenerateCommand command = spy(new GenerateCommand());
-        new File("build/test-out").mkdir();
+        // Given
+        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "context-map", "-o", testOutDirString};
 
-        // when
-        command.run(new String[]{"-i", "src/test/resources/test.cml", "-g", "context-map", "-o", "build/test-out"});
+        // When
+        int exitCode = cmd.execute(args);
 
-        // then
-        assertThat(outContent.toString()).contains("Generated into 'build/test-out'.");
-        assertThat(new File("build/test-out/test_ContextMap.gv").exists()).isTrue();
-        assertThat(new File("build/test-out/test_ContextMap.png").exists()).isTrue();
-        assertThat(new File("build/test-out/test_ContextMap.svg").exists()).isTrue();
+        // Then
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(outContent.toString()).contains("Generated into '" + testOutDirString + "'.");
+        assertThat(new File(testOutDirString, "test_ContextMap.gv")).exists();
+        assertThat(new File(testOutDirString, "test_ContextMap.png")).exists();
+        assertThat(new File(testOutDirString, "test_ContextMap.svg")).exists();
     }
 
     @Test
+    @DisplayName("run() should generate generic output when generic generator and template are specified")
     void run_WhenCalledWithGenericParam_ThenGenerateGenericOutput() {
-        // given
-        final GenerateCommand command = spy(new GenerateCommand());
-        new File("build/test-out").mkdir();
+        // Given
+        String outputFileName = "test.md";
+        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "generic", "-o", testOutDirString, "-t", "src/test/resources/test.ftl", "-f", outputFileName};
 
-        // when
-        command.run(new String[]{"-i", "src/test/resources/test.cml", "-g", "generic", "-o", "build/test-out", "-t", "src/test/resources/test.ftl", "-f", "test.md"});
+        // When
+        int exitCode = cmd.execute(args);
 
-        // then
-        assertThat(outContent.toString()).contains("Generated into 'build/test-out'.");
-        assertThat(new File("build/test-out/test.md").exists()).isTrue();
+        // Then
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(outContent.toString()).contains("Generated into '" + testOutDirString + "'.");
+        assertThat(new File(testOutDirString, outputFileName)).exists();
+    }
+    
+    @Test
+    @DisplayName("run() should print error when generic generator is missing the template parameter")
+    void run_WhenGenericGeneratorMissingTemplate_ThenPrintError() {
+        // Given
+        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "generic", "-o", testOutDirString, "-f", "test.md"};
+
+        // When
+        int exitCode = cmd.execute(args);
+
+        // Then
+        assertThat(exitCode).isNotEqualTo(0);
+        assertThat(errContent.toString()).contains("The --template (-t) parameter is required for the 'generic' generator.");
     }
 
+    @Test
+    @DisplayName("run() should print error when generic generator is missing the output file parameter")
+    void run_WhenGenericGeneratorMissingOutputFile_ThenPrintError() {
+        // Given
+        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "generic", "-o", testOutDirString, "-t", "src/test/resources/test.ftl"};
+
+        // When
+        int exitCode = cmd.execute(args);
+
+        // Then
+        assertThat(exitCode).isNotEqualTo(0);
+        assertThat(errContent.toString()).contains("The --outputFile (-f) parameter is required for the 'generic' generator.");
+    }
+
+    @Test
+    @DisplayName("run() should print error and help when required options are missing")
+    void run_WhenRequiredOptionsMissing_ThenPrintErrorAndHelp() {
+        // Given
+        String[] args = {"generate"};
+
+        // When
+        int exitCode = cmd.execute(args);
+
+        // Then
+        assertThat(exitCode).isNotEqualTo(0);
+        assertThat(errContent.toString())
+            .contains("Missing required options: '--input=<inputPath>', '--generator=<generatorType>'")
+            .contains("Usage: cm generate [-hV] [-f=<outputFileName>] -g=<generatorType>");
+    }
 }

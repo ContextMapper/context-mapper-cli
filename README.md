@@ -90,6 +90,8 @@ If you want to contribute to this project you can create a fork and a pull reque
 
 ```bash
 ./gradlew clean build
+./gradlew clean build snapshot
+java -jar build/libs/context-mapper-cli-0.1.0-SNAPSHOT.jar
 ```
 
 ## Contributing
@@ -100,4 +102,3 @@ Contribution is always welcome! Here are some ways how you can contribute:
 
 ## Licence
 ContextMapper is released under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
-

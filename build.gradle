@@ -17,8 +17,8 @@ repositories {
 }
 
 dependencies {
-    implementation "commons-cli:commons-cli:${commonsCliVersion}"
     implementation "org.contextmapper:context-mapper-dsl:${cmlVersion}"
+    implementation "info.picocli:picocli:${picocliVersion}"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${jUnitVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-params:${jUnitVersion}"
@@ -43,6 +43,12 @@ jar {
                 'Main-Class': 'org.contextmapper.cli.ContextMapperCLI'
         )
     }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude('META-INF/LICENSE.txt', 'META-INF/NOTICE.txt', 'META-INF/DEPENDENCIES')
+    exclude('META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/services/**')
 }
 
 if (!project.hasProperty('signing.secretKeyRingFile')) {

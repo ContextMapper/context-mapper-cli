@@ -5,6 +5,9 @@ import org.contextmapper.dsl.generator.GenericContentGenerator;
 import org.contextmapper.dsl.generator.PlantUMLGenerator;
 import org.eclipse.xtext.generator.IGenerator2;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public enum ContextMapperGenerator {
 
     CONTEXT_MAP("context-map", "Graphical DDD Context Map"),
@@ -27,9 +30,15 @@ public enum ContextMapperGenerator {
         return description;
     }
 
+    public String getDisplayName() {
+        return this.name + " (" + this.description + ")";
+    }
+
     @Override
     public String toString() {
-        return this.name + " (" + this.description + ")";
+        // Picocli uses toString() for default value display and for completion candidates if no specific provider is set.
+        // Returning only the name makes it cleaner for command-line usage.
+        return this.name;
     }
 
     public static ContextMapperGenerator byName(String name) {
@@ -37,11 +46,12 @@ public enum ContextMapperGenerator {
             throw new IllegalArgumentException("Please provide a name for the generator.");
 
         for (ContextMapperGenerator generator : values()) {
-            if (generator.getName().equals(name))
+            if (generator.getName().equalsIgnoreCase(name)) // Make it case-insensitive for user-friendliness
                 return generator;
         }
 
-        throw new IllegalArgumentException("No generator found for the name '" + name + "'.");
+        throw new IllegalArgumentException("No generator found for the name '" + name + "'. Valid values are: " +
+                Arrays.stream(values()).map(ContextMapperGenerator::getName).collect(Collectors.joining(", ")));
     }
 
     public IGenerator2 getGenerator() {
@@ -49,6 +59,7 @@ public enum ContextMapperGenerator {
             return new ContextMapGenerator();
         if (this == PLANT_UML)
             return new PlantUMLGenerator();
+        // Assumes GENERIC is the only other case based on current enum values
         return new GenericContentGenerator();
     }
 

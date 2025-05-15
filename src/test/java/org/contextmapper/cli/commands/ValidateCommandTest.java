@@ -1,91 +1,125 @@
-/*
- * Copyright 2021 The Context Mapper Project Team
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.contextmapper.cli.commands;
 
+import org.contextmapper.cli.ContextMapperCLI;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.DisplayName;
+import picocli.CommandLine;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class ValidateCommandTest {
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
     private final PrintStream originalErr = System.err;
+    private CommandLine cmd;
 
     @BeforeEach
-    public void setUpStreams() {
+    void setUp() {
         System.setOut(new PrintStream(outContent));
         System.setErr(new PrintStream(errContent));
+        cmd = new CommandLine(new ContextMapperCLI());
     }
 
     @AfterEach
-    public void restoreStreams() {
+    void restoreStreams() {
         System.setOut(originalOut);
         System.setErr(originalErr);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"-h", "--help", "-i some-file.cml -h", "-i some-file.cml --help"})
-    void run_WhenCalledWithHelp_ThenPrintHelp(final String params) {
-        // given
-        final ValidateCommand command = spy(new ValidateCommand());
+    @Test
+    @DisplayName("run() should print help when called with -h option")
+    void run_WhenCalledWithHelp_ThenPrintHelp() {
+        // Given
+        String[] args = {"validate", "-h"};
 
-        // when
-        command.run(params.split(" "));
+        // When
+        int exitCode = cmd.execute(args);
 
-        // then
-        verify(command).printHelp(any());
+        // Then
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(outContent.toString())
+            .contains("Usage: cm validate [-hV] -i=<inputPath>")
+            .contains("Validates a CML file.");
     }
 
     @Test
+    @DisplayName("run() should validate successfully for a valid CML file")
     void run_WhenWithValidCMLFile_ThenValidateWithoutErrors() {
-        // given
-        final ValidateCommand command = spy(new ValidateCommand());
+        // Given
+        String[] args = {"validate", "-i", "src/test/resources/test.cml"};
 
-        // when
-        command.run(new String[]{"-i src/test/resources/test.cml"});
+        // When
+        int exitCode = cmd.execute(args);
 
-        // then
-        verify(command).printValidationMessages(any(), any());
+        // Then
+        assertThat(exitCode).isEqualTo(0);
         assertThat(outContent.toString()).contains("The CML file 'src/test/resources/test.cml' has been validated without errors.");
     }
 
     @Test
+    @DisplayName("run() should print error for an invalid CML file")
     void run_WhenWithInvalidCMLFile_ThenPrintError() {
-        // given
-        final ValidateCommand command = spy(new ValidateCommand());
+        // Given
+        String[] args = {"validate", "-i", "src/test/resources/test-with-error.cml"};
 
-        // when
-        command.run(new String[]{"-i src/test/resources/test-with-error.cml"});
+        // When
+        int exitCode = cmd.execute(args);
 
-        // then
-        verify(command).printValidationMessages(any(), any());
-        assertThat(outContent.toString()).contains("ERROR in null on line 2:mismatched input '<EOF>' expecting RULE_CLOSE");
+        // Then
+        assertThat(exitCode).isEqualTo(1);
+        assertThat(errContent.toString()).contains("ERROR in null on line 2:mismatched input '<EOF>' expecting RULE_CLOSE");
     }
 
+    @Test
+    @DisplayName("run() should print error when input file does not exist")
+    void run_WhenInputFileDoesNotExist_ThenPrintError() {
+        // Given
+        String nonExistingFile = "nonexistent.cml";
+        String[] args = {"validate", "-i", nonExistingFile};
+
+        // When
+        int exitCode = cmd.execute(args);
+
+        // Then
+        assertThat(exitCode).isEqualTo(1);
+        assertThat(errContent.toString()).contains("ERROR: The file '" + nonExistingFile + "' does not exist.");
+    }
+
+    @Test
+    @DisplayName("run() should print error when input file is not a CML file")
+    void run_WhenInputFileIsNotCML_ThenPrintError() {
+        // Given
+        String notACmlFile = "src/test/resources/test.txt";
+        String[] args = {"validate", "-i", notACmlFile};
+
+        // When
+        int exitCode = cmd.execute(args);
+
+        // Then
+        assertThat(exitCode).isEqualTo(1);
+        assertThat(errContent.toString()).contains("ERROR: Please provide a path to a CML (*.cml) file.");
+    }
+
+    @Test
+    @DisplayName("run() should print error and help when no input file is provided")
+    void run_WhenNoInputFileProvided_ThenPrintErrorAndHelp() {
+        // Given
+        String[] args = {"validate"};
+
+        // When
+        int exitCode = cmd.execute(args);
+
+        // Then
+        assertThat(exitCode).isNotEqualTo(0);
+        assertThat(errContent.toString())
+            .contains("Missing required option: '--input=<inputPath>'")
+            .contains("Usage: cm validate [-hV] -i=<inputPath>");
+    }
 }

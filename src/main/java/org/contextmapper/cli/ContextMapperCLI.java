@@ -15,61 +15,44 @@
  */
 package org.contextmapper.cli;
 
-import org.contextmapper.cli.commands.CliCommand;
 import org.contextmapper.cli.commands.GenerateCommand;
 import org.contextmapper.cli.commands.ValidateCommand;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-public class ContextMapperCLI {
+@Command(name = "cm", mixinStandardHelpOptions = true, versionProvider = VersionProvider.class,
+        description = "Context Mapper CLI",
+        subcommands = {
+                ValidateCommand.class,
+                GenerateCommand.class
+        })
+public class ContextMapperCLI implements Runnable {
 
     private static final int REQUIRED_JAVA_VERSION = 11;
-    private static final String VALIDATE_COMMAND = "validate";
-    private static final String GENERATE_COMMAND = "generate";
-
-    private CliCommand generateCommand;
-    private CliCommand validateCommand;
-
-    public ContextMapperCLI() {
-        this.generateCommand = new GenerateCommand();
-        this.validateCommand = new ValidateCommand();
-    }
 
     public static void main(String[] args) {
-        int javaVersion = Runtime.version().feature();
-
-        if (Runtime.version().feature() >= REQUIRED_JAVA_VERSION) {
-            new ContextMapperCLI().run(args);
-        } else {
-            System.out.printf("Invalid Java version '%s' (>=%s is required).", javaVersion, REQUIRED_JAVA_VERSION);
+        if (Runtime.version().feature() < REQUIRED_JAVA_VERSION) {
+            System.err.printf("Invalid Java version '%s' (>=%s is required).%n", Runtime.version().feature(), REQUIRED_JAVA_VERSION);
             System.exit(1);
         }
+        int exitCode = new CommandLine(new ContextMapperCLI()).execute(args);
+        System.exit(exitCode);
     }
 
-    protected void run(String[] args) {
-        System.out.println("Context Mapper CLI " + getVersion());
-
-        if (args == null || args.length == 0) {
-            printUsages();
-        } else if (VALIDATE_COMMAND.equalsIgnoreCase(args[0])) {
-            validateCommand.run(Arrays.copyOfRange(args, 1, args.length));
-        } else if (GENERATE_COMMAND.equalsIgnoreCase(args[0])) {
-            generateCommand.run(Arrays.copyOfRange(args, 1, args.length));
-        } else {
-            System.out.println("Invalid input");
-            System.exit(127);
-        }
+    @Override
+    public void run() {
+        // This is executed if no subcommand is specified.
+        // Picocli will show the help message by default if mixinStandardHelpOptions = true and no subcommand is given.
+        // We can add a custom message here if needed, or rely on Picocli's default behavior.
+        System.out.println("Context Mapper CLI. Use 'cm --help' for usage information.");
     }
 
-    private void printUsages() {
-        System.out.println("Usage: cm " + VALIDATE_COMMAND + "|" + GENERATE_COMMAND + " [options]");
-    }
+}
 
-    private String getVersion() {
+class VersionProvider implements CommandLine.IVersionProvider {
+    @Override
+    public String[] getVersion() throws Exception {
         String implVersion = ContextMapperCLI.class.getPackage().getImplementationVersion();
-        return implVersion != null ? "v" + implVersion : "DEVELOPMENT VERSION";
+        return new String[]{"Context Mapper CLI " + (implVersion != null ? "v" + implVersion : "DEVELOPMENT VERSION")};
     }
-
 }
