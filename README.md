@@ -88,6 +88,10 @@ The following examples illustrate the CLI usage.
 ## Development / Build
 If you want to contribute to this project you can create a fork and a pull request. The project is built with Gradle, so you can import it as Gradle project within Eclipse or IntelliJ IDEA (or any other IDE supporting Gradle).
 
+```bash
+./gradlew clean build
+```
+
 ## Contributing
 Contribution is always welcome! Here are some ways how you can contribute:
 * Create GitHub issues if you find bugs or just want to give suggestions for improvements.
