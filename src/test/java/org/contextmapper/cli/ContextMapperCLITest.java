@@ -106,4 +106,22 @@ class ContextMapperCLITest {
         assertThat(exitCode).isNotEqualTo(0);
         assertThat(errContent.toString()).contains("Unmatched argument at index 0: 'invalid-command'");
     }
+
+    @Test
+    @DisplayName("runCLI() should return 0 and print help when called with --help option")
+    void runCLI_WhenCalledWithHelpOption_ThenReturnsZeroAndPrintsHelp() {
+        // Given
+        String[] args = {"--help"};
+
+        // When
+        int exitCode = ContextMapperCLI.runCLI(args);
+
+        // Then
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(outContent.toString())
+            .contains("Usage: cm [-hV] [COMMAND]")
+            .contains("Commands:")
+            .contains("validate  Validates a CML file.")
+            .contains("generate  Generates output from a CML file.");
+    }
 }
