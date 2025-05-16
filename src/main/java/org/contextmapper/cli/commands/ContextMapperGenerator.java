@@ -6,6 +6,7 @@ import org.contextmapper.dsl.generator.PlantUMLGenerator;
 import org.eclipse.xtext.generator.IGenerator2;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public enum ContextMapperGenerator {
@@ -36,31 +37,27 @@ public enum ContextMapperGenerator {
 
     @Override
     public String toString() {
-        // Picocli uses toString() for default value display and for completion candidates if no specific provider is set.
-        // Returning only the name makes it cleaner for command-line usage.
         return this.name;
     }
 
     public static ContextMapperGenerator byName(String name) {
-        if (name == null || "".equals(name))
+        // Preconditions check
+        if (Objects.isNull(name) || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Please provide a name for the generator.");
-
-        for (ContextMapperGenerator generator : values()) {
-            if (generator.getName().equalsIgnoreCase(name)) // Make it case-insensitive for user-friendliness
-                return generator;
         }
-
-        throw new IllegalArgumentException("No generator found for the name '" + name + "'. Valid values are: " +
-                Arrays.stream(values()).map(ContextMapperGenerator::getName).collect(Collectors.joining(", ")));
+        return Arrays.stream(values())
+                .filter(gen -> gen.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No generator found for the name '" + name +
+                        "'. Valid values are: " +
+                        Arrays.stream(values()).map(ContextMapperGenerator::getName).collect(Collectors.joining(", "))));
     }
 
     public IGenerator2 getGenerator() {
-        if (this == CONTEXT_MAP)
-            return new ContextMapGenerator();
-        if (this == PLANT_UML)
-            return new PlantUMLGenerator();
-        // Assumes GENERIC is the only other case based on current enum values
-        return new GenericContentGenerator();
+        return switch (this) {
+            case CONTEXT_MAP -> new ContextMapGenerator();
+            case PLANT_UML -> new PlantUMLGenerator();
+            case GENERIC -> new GenericContentGenerator();
+        };
     }
-
 }

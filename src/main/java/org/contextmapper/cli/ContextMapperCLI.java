@@ -4,7 +4,6 @@ import org.contextmapper.cli.commands.GenerateCommand;
 import org.contextmapper.cli.commands.ValidateCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import java.util.function.Supplier;
 
 @Command(
     name = "cm",
