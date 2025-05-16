@@ -52,7 +52,7 @@ class GenerateCommandTest {
     @DisplayName("run() should print help when called with -h option")
     void run_WhenCalledWithHelp_ThenPrintHelp() {
         // Given
-        String[] args = {"generate", "-h"};
+        String[] args = { "generate", "-h" };
 
         // When
         int exitCode = cmd.execute(args);
@@ -60,8 +60,8 @@ class GenerateCommandTest {
         // Then
         assertThat(exitCode).isEqualTo(0);
         assertThat(outContent.toString())
-            .contains("Usage: cm generate [-hV] [-f=<outputFileName>] -g=<generatorType>")
-            .contains("Generates output from a CML file.");
+                .contains("Usage: cm generate [-hV] [-f=<outputFileName>] -g=<generatorType>")
+                .contains("Generates output from a CML file.");
     }
 
     @Test
@@ -69,7 +69,7 @@ class GenerateCommandTest {
     void run_WhenCalledWithNonExistingOutDir_ThenPrintError() {
         // Given
         String nonExistingDir = "/just-some-dir-that-hopefully-not-exists-unless-you-are-very-unlucky";
-        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "plantuml", "-o", nonExistingDir};
+        String[] args = { "generate", "-i", "src/test/resources/test.cml", "-g", "plantuml", "-o", nonExistingDir };
 
         // When
         int exitCode = cmd.execute(args);
@@ -84,7 +84,7 @@ class GenerateCommandTest {
     void run_WhenCalledWithNonExistingInputFile_ThenPrintError() {
         // Given
         String nonExistingFile = "just-a-file-that-does-not-exist.cml";
-        String[] args = {"generate", "-i", nonExistingFile, "-g", "plantuml", "-o", testOutDirString};
+        String[] args = { "generate", "-i", nonExistingFile, "-g", "plantuml", "-o", testOutDirString };
 
         // When
         int exitCode = cmd.execute(args);
@@ -98,7 +98,7 @@ class GenerateCommandTest {
     @DisplayName("run() should generate PlantUML files when plantuml generator is specified")
     void run_WhenCalledWithPlantUMLParam_ThenGeneratePlantUMLFiles() {
         // Given
-        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "plantuml", "-o", testOutDirString};
+        String[] args = { "generate", "-i", "src/test/resources/test.cml", "-g", "plantuml", "-o", testOutDirString };
 
         // When
         int exitCode = cmd.execute(args);
@@ -116,7 +116,8 @@ class GenerateCommandTest {
     @DisplayName("run() should generate Context Map files when context-map generator is specified")
     void run_WhenCalledWithContextMapParam_ThenGenerateContextMapFiles() {
         // Given
-        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "context-map", "-o", testOutDirString};
+        String[] args = { "generate", "-i", "src/test/resources/test.cml", "-g", "context-map", "-o",
+                testOutDirString };
 
         // When
         int exitCode = cmd.execute(args);
@@ -134,7 +135,8 @@ class GenerateCommandTest {
     void run_WhenCalledWithGenericParam_ThenGenerateGenericOutput() {
         // Given
         String outputFileName = "test.md";
-        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "generic", "-o", testOutDirString, "-t", "src/test/resources/test.ftl", "-f", outputFileName};
+        String[] args = { "generate", "-i", "src/test/resources/test.cml", "-g", "generic", "-o", testOutDirString,
+                "-t", "src/test/resources/test.ftl", "-f", outputFileName };
 
         // When
         int exitCode = cmd.execute(args);
@@ -144,40 +146,13 @@ class GenerateCommandTest {
         assertThat(outContent.toString()).contains("Generated into '" + testOutDirString + "'.");
         assertThat(new File(testOutDirString, outputFileName)).exists();
     }
-    
+
     @Test
     @DisplayName("run() should print error when generic generator is missing the template parameter")
     void run_WhenGenericGeneratorMissingTemplate_ThenPrintError() {
         // Given
-        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "generic", "-o", testOutDirString, "-f", "test.md"};
-
-        // When
-        int exitCode = cmd.execute(args);
-
-        // Then
-        assertThat(exitCode).isNotEqualTo(0);
-        assertThat(errContent.toString()).contains("The --template (-t) parameter is required for the 'generic' generator.");
-    }
-
-    @Test
-    @DisplayName("run() should print error when generic generator is missing the output file parameter")
-    void run_WhenGenericGeneratorMissingOutputFile_ThenPrintError() {
-        // Given
-        String[] args = {"generate", "-i", "src/test/resources/test.cml", "-g", "generic", "-o", testOutDirString, "-t", "src/test/resources/test.ftl"};
-
-        // When
-        int exitCode = cmd.execute(args);
-
-        // Then
-        assertThat(exitCode).isNotEqualTo(0);
-        assertThat(errContent.toString()).contains("The --outputFile (-f) parameter is required for the 'generic' generator.");
-    }
-
-    @Test
-    @DisplayName("run() should print error and help when required options are missing")
-    void run_WhenRequiredOptionsMissing_ThenPrintErrorAndHelp() {
-        // Given
-        String[] args = {"generate"};
+        String[] args = { "generate", "-i", "src/test/resources/test.cml", "-g", "generic", "-o", testOutDirString,
+                "-f", "test.md" };
 
         // When
         int exitCode = cmd.execute(args);
@@ -185,7 +160,38 @@ class GenerateCommandTest {
         // Then
         assertThat(exitCode).isNotEqualTo(0);
         assertThat(errContent.toString())
-            .contains("Missing required options: '--input=<inputPath>', '--generator=<generatorType>'")
-            .contains("Usage: cm generate [-hV] [-f=<outputFileName>] -g=<generatorType>");
+                .contains("The --template (-t) parameter is required for the 'generic' generator.");
+    }
+
+    @Test
+    @DisplayName("run() should print error when generic generator is missing the output file parameter")
+    void run_WhenGenericGeneratorMissingOutputFile_ThenPrintError() {
+        // Given
+        String[] args = { "generate", "-i", "src/test/resources/test.cml", "-g", "generic", "-o", testOutDirString,
+                "-t", "src/test/resources/test.ftl" };
+
+        // When
+        int exitCode = cmd.execute(args);
+
+        // Then
+        assertThat(exitCode).isNotEqualTo(0);
+        assertThat(errContent.toString())
+                .contains("The --outputFile (-f) parameter is required for the 'generic' generator.");
+    }
+
+    @Test
+    @DisplayName("run() should print error and help when required options are missing")
+    void run_WhenRequiredOptionsMissing_ThenPrintErrorAndHelp() {
+        // Given
+        String[] args = { "generate" };
+
+        // When
+        int exitCode = cmd.execute(args);
+
+        // Then
+        assertThat(exitCode).isNotEqualTo(0);
+        assertThat(errContent.toString())
+                .contains("Missing required options: '--input=<inputPath>', '--generator=<generatorType>'")
+                .contains("Usage: cm generate [-hV] [-f=<outputFileName>] -g=<generatorType>");
     }
 }

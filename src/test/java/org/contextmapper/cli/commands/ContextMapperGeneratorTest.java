@@ -18,7 +18,8 @@ class ContextMapperGeneratorTest {
             "PLANT_UML, plantuml",
             "GENERIC, generic"
     })
-    void getName_WhenUsingGeneratorEnumValue_ThenCanGetGeneratorName(ContextMapperGenerator generator, String expectedName) {
+    void getName_WhenUsingGeneratorEnumValue_ThenCanGetGeneratorName(ContextMapperGenerator generator,
+            String expectedName) {
         // Given
         // generator and expectedName are provided by @CsvSource
 
@@ -30,7 +31,7 @@ class ContextMapperGeneratorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"CONTEXT_MAP", "PLANT_UML", "GENERIC"})
+    @ValueSource(strings = { "CONTEXT_MAP", "PLANT_UML", "GENERIC" })
     void getDescription_WhenUsingGeneratorEnumValue_ThenCanGetGeneratorDescription(final String enumValueAsString) {
         // Given
         final ContextMapperGenerator generator = ContextMapperGenerator.valueOf(enumValueAsString);
@@ -62,7 +63,7 @@ class ContextMapperGeneratorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"context-map", "plantuml", "generic", "CONTEXT-MAP", "PlantUML", "GeNeRiC"})
+    @ValueSource(strings = { "context-map", "plantuml", "generic", "CONTEXT-MAP", "PlantUML", "GeNeRiC" })
     void byName_WhenWithValidName_ThenReturnGenerator(final String validGeneratorKey) {
         // Given
         // validGeneratorKey is provided by @ValueSource
@@ -80,8 +81,7 @@ class ContextMapperGeneratorTest {
         // No specific setup needed
 
         // When & Then
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                ContextMapperGenerator.byName(null))
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> ContextMapperGenerator.byName(null))
                 .withMessageContaining("Please provide a name for the generator.");
     }
 
@@ -91,8 +91,7 @@ class ContextMapperGeneratorTest {
         // No specific setup needed
 
         // When & Then
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                ContextMapperGenerator.byName(""))
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> ContextMapperGenerator.byName(""))
                 .withMessageContaining("Please provide a name for the generator.");
     }
 
@@ -102,13 +101,14 @@ class ContextMapperGeneratorTest {
         // No specific setup needed
 
         // When & Then
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                ContextMapperGenerator.byName("just a string"))
-                .withMessageContaining("No generator found for the name 'just a string'. Valid values are: context-map, plantuml, generic");
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> ContextMapperGenerator.byName("just a string"))
+                .withMessageContaining(
+                        "No generator found for the name 'just a string'. Valid values are: context-map, plantuml, generic");
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"CONTEXT_MAP", "PLANT_UML", "GENERIC"})
+    @ValueSource(strings = { "CONTEXT_MAP", "PLANT_UML", "GENERIC" })
     void getGenerator_WhenCalled_ThenReturnGeneratorImplementation(final String enumValueAsString) {
         // Given
         final ContextMapperGenerator generator = ContextMapperGenerator.valueOf(enumValueAsString);
@@ -133,7 +133,7 @@ class ContextMapperGeneratorTest {
 
         // When
         String displayName = generator.getDisplayName();
-        
+
         // Then
         assertThat(displayName).isEqualTo(expectedDisplayName);
     }

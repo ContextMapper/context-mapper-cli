@@ -36,8 +36,8 @@ class VersionProviderTest {
 
         // Assert
         assertThat(version).isNotNull()
-                           .hasSize(1)
-                           .containsExactly("Context Mapper CLI v" + expectedVersion);
+                .hasSize(1)
+                .containsExactly("Context Mapper CLI v" + expectedVersion);
     }
 
     @Test
@@ -52,8 +52,8 @@ class VersionProviderTest {
 
         // Assert
         assertThat(version).isNotNull()
-                           .hasSize(1)
-                           .containsExactly("Context Mapper CLI DEVELOPMENT VERSION");
+                .hasSize(1)
+                .containsExactly("Context Mapper CLI DEVELOPMENT VERSION");
     }
 
     @Test
@@ -66,7 +66,7 @@ class VersionProviderTest {
 
         // Assert
         assertThat(version).isNotNull()
-                           .hasSize(1)
-                           .containsExactly("Context Mapper CLI DEVELOPMENT VERSION");
+                .hasSize(1)
+                .containsExactly("Context Mapper CLI DEVELOPMENT VERSION");
     }
-} 
+}

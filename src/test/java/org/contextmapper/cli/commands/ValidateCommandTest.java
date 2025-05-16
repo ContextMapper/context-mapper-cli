@@ -37,7 +37,7 @@ class ValidateCommandTest {
     @DisplayName("run() should print help when called with -h option")
     void run_WhenCalledWithHelp_ThenPrintHelp() {
         // Given
-        String[] args = {"validate", "-h"};
+        String[] args = { "validate", "-h" };
 
         // When
         int exitCode = cmd.execute(args);
@@ -45,36 +45,38 @@ class ValidateCommandTest {
         // Then
         assertThat(exitCode).isEqualTo(0);
         assertThat(outContent.toString())
-            .contains("Usage: cm validate [-hV] -i=<inputPath>")
-            .contains("Validates a CML file.");
+                .contains("Usage: cm validate [-hV] -i=<inputPath>")
+                .contains("Validates a CML file.");
     }
 
     @Test
     @DisplayName("run() should validate successfully for a valid CML file")
     void run_WhenWithValidCMLFile_ThenValidateWithoutErrors() {
         // Given
-        String[] args = {"validate", "-i", "src/test/resources/test.cml"};
+        String[] args = { "validate", "-i", "src/test/resources/test.cml" };
 
         // When
         int exitCode = cmd.execute(args);
 
         // Then
         assertThat(exitCode).isEqualTo(0);
-        assertThat(outContent.toString()).contains("The CML file 'src/test/resources/test.cml' has been validated without errors.");
+        assertThat(outContent.toString())
+                .contains("The CML file 'src/test/resources/test.cml' has been validated without errors.");
     }
 
     @Test
     @DisplayName("run() should print error for an invalid CML file")
     void run_WhenWithInvalidCMLFile_ThenPrintError() {
         // Given
-        String[] args = {"validate", "-i", "src/test/resources/test-with-error.cml"};
+        String[] args = { "validate", "-i", "src/test/resources/test-with-error.cml" };
 
         // When
         int exitCode = cmd.execute(args);
 
         // Then
         assertThat(exitCode).isEqualTo(1);
-        assertThat(errContent.toString()).contains("ERROR in null on line 2:mismatched input '<EOF>' expecting RULE_CLOSE");
+        assertThat(errContent.toString())
+                .contains("ERROR in null on line 2:mismatched input '<EOF>' expecting RULE_CLOSE");
     }
 
     @Test
@@ -82,7 +84,7 @@ class ValidateCommandTest {
     void run_WhenInputFileDoesNotExist_ThenPrintError() {
         // Given
         String nonExistingFile = "nonexistent.cml";
-        String[] args = {"validate", "-i", nonExistingFile};
+        String[] args = { "validate", "-i", nonExistingFile };
 
         // When
         int exitCode = cmd.execute(args);
@@ -97,7 +99,7 @@ class ValidateCommandTest {
     void run_WhenInputFileIsNotCML_ThenPrintError() {
         // Given
         String notACmlFile = "src/test/resources/test.txt";
-        String[] args = {"validate", "-i", notACmlFile};
+        String[] args = { "validate", "-i", notACmlFile };
 
         // When
         int exitCode = cmd.execute(args);
@@ -111,7 +113,7 @@ class ValidateCommandTest {
     @DisplayName("run() should print error and help when no input file is provided")
     void run_WhenNoInputFileProvided_ThenPrintErrorAndHelp() {
         // Given
-        String[] args = {"validate"};
+        String[] args = { "validate" };
 
         // When
         int exitCode = cmd.execute(args);
@@ -119,7 +121,7 @@ class ValidateCommandTest {
         // Then
         assertThat(exitCode).isNotEqualTo(0);
         assertThat(errContent.toString())
-            .contains("Missing required option: '--input=<inputPath>'")
-            .contains("Usage: cm validate [-hV] -i=<inputPath>");
+                .contains("Missing required option: '--input=<inputPath>'")
+                .contains("Usage: cm validate [-hV] -i=<inputPath>");
     }
 }

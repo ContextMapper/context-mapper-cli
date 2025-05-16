@@ -49,7 +49,7 @@ class ContextMapperCLITest {
     @DisplayName("main() should print top-level help when called with --help option")
     void main_WhenCalledWithHelpOption_ThenPrintsTopLevelHelp() {
         // Given
-        String[] args = {"--help"};
+        String[] args = { "--help" };
 
         // When
         int exitCode = cmd.execute(args);
@@ -57,17 +57,17 @@ class ContextMapperCLITest {
         // Then
         assertThat(exitCode).isEqualTo(0);
         assertThat(outContent.toString())
-            .contains("Usage: cm [-hV] [COMMAND]")
-            .contains("Commands:")
-            .contains("validate  Validates a CML file.")
-            .contains("generate  Generates output from a CML file.");
+                .contains("Usage: cm [-hV] [COMMAND]")
+                .contains("Commands:")
+                .contains("validate  Validates a CML file.")
+                .contains("generate  Generates output from a CML file.");
     }
 
     @Test
     @DisplayName("main() should print version when called with --version option")
     void main_WhenCalledWithVersionOption_ThenPrintsVersion() {
         // Given
-        String[] args = {"--version"};
+        String[] args = { "--version" };
 
         // When
         int exitCode = cmd.execute(args);
@@ -81,7 +81,7 @@ class ContextMapperCLITest {
     @DisplayName("main() should print error and usage when called with an invalid option")
     void main_WhenCalledWithInvalidOption_ThenPrintsErrorAndUsage() {
         // Given
-        String[] args = {"--invalid-option"};
+        String[] args = { "--invalid-option" };
 
         // When
         int exitCode = cmd.execute(args);
@@ -89,15 +89,15 @@ class ContextMapperCLITest {
         // Then
         assertThat(exitCode).isNotEqualTo(0);
         assertThat(errContent.toString())
-            .contains("Unknown option: '--invalid-option'")
-            .contains("Usage: cm [-hV] [COMMAND]");
+                .contains("Unknown option: '--invalid-option'")
+                .contains("Usage: cm [-hV] [COMMAND]");
     }
 
     @Test
     @DisplayName("main() should print error and usage when called with an invalid subcommand")
     void main_WhenCalledWithInvalidSubcommand_ThenPrintsErrorAndUsage() {
         // Given
-        String[] args = {"invalid-command"};
+        String[] args = { "invalid-command" };
 
         // When
         int exitCode = cmd.execute(args);
@@ -105,23 +105,5 @@ class ContextMapperCLITest {
         // Then
         assertThat(exitCode).isNotEqualTo(0);
         assertThat(errContent.toString()).contains("Unmatched argument at index 0: 'invalid-command'");
-    }
-
-    @Test
-    @DisplayName("runCLI() should return 0 and print help when called with --help option")
-    void runCLI_WhenCalledWithHelpOption_ThenReturnsZeroAndPrintsHelp() {
-        // Given
-        String[] args = {"--help"};
-
-        // When
-        int exitCode = ContextMapperCLI.runCLI(args);
-
-        // Then
-        assertThat(exitCode).isEqualTo(0);
-        assertThat(outContent.toString())
-            .contains("Usage: cm [-hV] [COMMAND]")
-            .contains("Commands:")
-            .contains("validate  Validates a CML file.")
-            .contains("generate  Generates output from a CML file.");
     }
 }

@@ -95,6 +95,9 @@ sdk env install
 jwebserver -p 9000 -d "$(pwd)/build/reports/"
 ./gradlew clean build snapshot
 java -jar build/libs/context-mapper-cli-0.1.0-SNAPSHOT.jar
+
+sdk use java 11.0.27-tem
+java -jar build/libs/context-mapper-cli-0.1.0-SNAPSHOT.jar
 ```
 
 ## Contributing
