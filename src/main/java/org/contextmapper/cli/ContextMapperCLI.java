@@ -18,7 +18,7 @@ import java.util.function.Supplier;
     usageHelpAutoWidth = true)
 public class ContextMapperCLI implements Runnable {
 
-    private static final int REQUIRED_JAVA_VERSION = 11;
+    private static final int REQUIRED_JAVA_VERSION = 17;
     static Supplier<Integer> javaVersionSupplier = () -> Runtime.version().feature();
 
     @Override
