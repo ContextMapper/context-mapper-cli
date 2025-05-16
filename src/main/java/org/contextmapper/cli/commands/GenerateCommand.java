@@ -9,65 +9,54 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
-@Command(name = "generate", description = "Generates output from a CML file.", mixinStandardHelpOptions = true)
+@Command(
+    name = "generate",
+    description = "Generates output from a CML file.",
+    mixinStandardHelpOptions = true)
 public class GenerateCommand implements Callable<Integer> {
 
-    @Option(names = {"-i", "--input"}, description = "Path to the CML file for which you want to generate output.", required = true)
+    @Option(
+        names = {"-i", "--input"},
+        description = "Path to the CML file for which you want to generate output.",
+        required = true)
     private String inputPath;
 
-    @Option(names = {"-g", "--generator"}, description = "The generator you want to call. Use one of the following values: ${COMPLETION-CANDIDATES}", required = true)
+    @Option(
+        names = {"-g", "--generator"},
+        description = """
+            The generator you want to call.
+            Use one of the following values: ${COMPLETION-CANDIDATES}
+            """)
     private ContextMapperGenerator generatorType;
 
-    @Option(names = {"-o", "--outputDir"}, description = "Path to the directory into which you want to generate.", defaultValue = ".")
+    @Option(
+        names = {"-o", "--outputDir"},
+        description = "Path to the directory into which you want to generate.",
+        defaultValue = ".")
     private String outputDir;
 
-    @Option(names = {"-t", "--template"}, description = "Path to the Freemarker template you want to use. This parameter is only used if you pass 'generic' to the 'generator' (-g) parameter.")
+    @Option(
+        names = {"-t", "--template"},
+        description = """
+            Path to the Freemarker template you want to use.
+            This parameter is only used if you pass 'generic' to the 'generator' (-g) parameter.
+            """
+        )
     private File templateFile;
 
-    @Option(names = {"-f", "--outputFile"}, description = "The name of the file that shall be generated (only used by Freemarker generator, as we cannot know the file extension).")
+    @Option(
+        names = {"-f", "--outputFile"},
+        description = """
+            The name of the file that shall be generated (only used by Freemarker generator,
+            as we cannot know the file extension).
+            """
+        )
     private String outputFileName;
 
-    @Override
-    public Integer call() throws Exception {
-        if (!isInputFileValid(inputPath)) {
-            return 1;
-        }
-
-        if (!doesOutputDirExist(this.outputDir)) {
-            return 1;
-        }
-
-        StandaloneContextMapperAPI cmAPI = ContextMapperStandaloneSetup.getStandaloneAPI();
-        CMLResource cmlResource = cmAPI.loadCML(inputPath);
-        IGenerator2 generator = getGenerator();
-
-        cmAPI.callGenerator(cmlResource, generator, this.outputDir);
-        System.out.println("Generated into '" + this.outputDir + "'.");
-        return 0;
-    }
-
-    private IGenerator2 getGenerator() {
-        IGenerator2 selectedGenerator = generatorType.getGenerator();
-        if (selectedGenerator instanceof GenericContentGenerator) {
-            if (templateFile == null) {
-                throw new IllegalArgumentException("The --template (-t) parameter is required for the 'generic' generator.");
-            }
-            if (outputFileName == null || outputFileName.trim().isEmpty()) {
-                throw new IllegalArgumentException("The --outputFile (-f) parameter is required for the 'generic' generator.");
-            }
-            final GenericContentGenerator genericContentGenerator = (GenericContentGenerator) selectedGenerator;
-            genericContentGenerator.setFreemarkerTemplateFile(templateFile);
-            genericContentGenerator.setTargetFileName(outputFileName);
-            return genericContentGenerator;
-        }
-        return selectedGenerator;
-    }
-
-    protected boolean isInputFileValid(String path) {
+    private boolean isInputFileValid(String path) {
         File inputFile = new File(path);
         if (!inputFile.exists()) {
             System.err.println("ERROR: The file '" + path + "' does not exist.");
@@ -81,7 +70,7 @@ public class GenerateCommand implements Callable<Integer> {
     }
 
     private boolean doesOutputDirExist(String dirPath) {
-        if (dirPath == null || "".equals(dirPath)) {
+        if (Objects.isNull(dirPath) || dirPath.trim().isEmpty()) {
             // Should not happen with defaultValue, but good for robustness
             System.err.println("ERROR: Output directory path is empty.");
             return false;
@@ -98,19 +87,44 @@ public class GenerateCommand implements Callable<Integer> {
         }
         return true;
     }
-    
-    // Used by Picocli for auto-completion help for the generatorType option
-    static class ContextMapperGeneratorConverter implements picocli.CommandLine.ITypeConverter<ContextMapperGenerator> {
-        @Override
-        public ContextMapperGenerator convert(String value) throws Exception {
-            return ContextMapperGenerator.byName(value);
+
+    private IGenerator2 getGenerator() {
+        IGenerator2 selectedGenerator = generatorType.getGenerator();
+        if (selectedGenerator instanceof GenericContentGenerator) {
+            if (Objects.isNull(templateFile)) {
+                throw new IllegalArgumentException("The --template (-t) parameter is required for the 'generic' generator.");
+            }
+            if (Objects.isNull(outputFileName) || outputFileName.trim().isEmpty()) {
+                throw new IllegalArgumentException("The --outputFile (-f) parameter is required for the 'generic' generator.");
+            }
+            final GenericContentGenerator genericContentGenerator = (GenericContentGenerator) selectedGenerator;
+            genericContentGenerator.setFreemarkerTemplateFile(templateFile);
+            genericContentGenerator.setTargetFileName(outputFileName);
+            return genericContentGenerator;
         }
+        return selectedGenerator;
     }
-    
-    // This is to provide dynamic completion candidates for the --generator option in help messages.
-    // Picocli will replace ${COMPLETION-CANDIDATES} with the output of this.
-    // However, for this to work properly, ContextMapperGenerator.toString() should be just the name.
-    // Or we can provide a custom ICompletionCandidate provider.
-    // For now, I will adjust ContextMapperGenerator.toString() and how its help is constructed.
-    // Let's ensure the ContextMapperGenerator class is also updated for better Picocli integration.
+
+    private Integer runCall() {
+        // Preconditions check
+        if (!isInputFileValid(inputPath)) {
+            return 1;
+        }
+        if (!doesOutputDirExist(this.outputDir)) {
+            return 1;
+        }
+
+        StandaloneContextMapperAPI cmAPI = ContextMapperStandaloneSetup.getStandaloneAPI();
+        CMLResource cmlResource = cmAPI.loadCML(inputPath);
+        IGenerator2 generator = getGenerator();
+
+        cmAPI.callGenerator(cmlResource, generator, this.outputDir);
+        System.out.println("Generated into '" + this.outputDir + "'.");
+        return 0;
+    }
+
+    @Override
+    public Integer call() throws Exception {
+        return runCall();
+    }
 }
