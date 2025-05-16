@@ -1,99 +1,137 @@
 package org.contextmapper.cli.commands;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import org.eclipse.xtext.generator.IGenerator2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class ContextMapperGeneratorTest {
 
     @ParameterizedTest
-    @ValueSource(strings = {"CONTEXT_MAP", "PLANT_UML", "GENERIC"})
-    void getName_WhenUsingGeneratorEnumValue_ThenCanGetGeneratorName(final String enumValueAsString) {
-        // given
-        final ContextMapperGenerator generator = ContextMapperGenerator.valueOf(enumValueAsString);
+    @CsvSource({
+            "CONTEXT_MAP, context-map",
+            "PLANT_UML, plantuml",
+            "GENERIC, generic"
+    })
+    void getName_WhenUsingGeneratorEnumValue_ThenCanGetGeneratorName(ContextMapperGenerator generator,
+            String expectedName) {
+        // Given
+        // generator and expectedName are provided by @CsvSource
 
-        // when
+        // When
         final String name = generator.getName();
 
-        // then
-        assertThat(name)
-                .isNotNull()
-                .isNotEmpty();
+        // Then
+        assertThat(name).isEqualTo(expectedName);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"CONTEXT_MAP", "PLANT_UML", "GENERIC"})
+    @ValueSource(strings = { "CONTEXT_MAP", "PLANT_UML", "GENERIC" })
     void getDescription_WhenUsingGeneratorEnumValue_ThenCanGetGeneratorDescription(final String enumValueAsString) {
-        // given
+        // Given
         final ContextMapperGenerator generator = ContextMapperGenerator.valueOf(enumValueAsString);
 
-        // when
+        // When
         final String description = generator.getDescription();
 
-        // then
+        // Then
         assertThat(description)
                 .isNotNull()
                 .isNotEmpty();
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"CONTEXT_MAP", "PLANT_UML", "GENERIC"})
-    void toString_WhenUsingGeneratorEnumValue_ThenCanGetStringRepresentation(final String enumValueAsString) {
-        // given
-        final ContextMapperGenerator generator = ContextMapperGenerator.valueOf(enumValueAsString);
+    @CsvSource({
+            "CONTEXT_MAP, context-map",
+            "PLANT_UML, plantuml",
+            "GENERIC, generic"
+    })
+    void toString_ReturnsName(ContextMapperGenerator generator, String expectedName) {
+        // Given
+        // generator and expectedName are provided by @CsvSource
 
-        // when
+        // When
         final String stringRepresentation = generator.toString();
 
-        // then
-        assertThat(stringRepresentation)
-                .isNotNull()
-                .isNotEmpty();
+        // Then
+        assertThat(stringRepresentation).isEqualTo(expectedName);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"context-map", "plantuml", "generic"})
+    @ValueSource(strings = { "context-map", "plantuml", "generic", "CONTEXT-MAP", "PlantUML", "GeNeRiC" })
     void byName_WhenWithValidName_ThenReturnGenerator(final String validGeneratorKey) {
-        // when
+        // Given
+        // validGeneratorKey is provided by @ValueSource
+
+        // When
         final ContextMapperGenerator generator = ContextMapperGenerator.byName(validGeneratorKey);
 
-        // then
+        // Then
         assertThat(generator).isNotNull();
     }
 
     @Test
     void byName_WhenWithoutName_ThenThrowIllegalArgumentException() {
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                ContextMapperGenerator.byName(null));
+        // Given
+        // No specific setup needed
+
+        // When & Then
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> ContextMapperGenerator.byName(null))
+                .withMessageContaining("Please provide a name for the generator.");
     }
 
     @Test
     void byName_WhenWithEmptyName_ThenThrowIllegalArgumentException() {
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                ContextMapperGenerator.byName(""));
+        // Given
+        // No specific setup needed
+
+        // When & Then
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> ContextMapperGenerator.byName(""))
+                .withMessageContaining("Please provide a name for the generator.");
     }
 
     @Test
     void byName_WhenWithInvalidName_ThenThrowIllegalArgumentException() {
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                ContextMapperGenerator.byName("just a string"));
+        // Given
+        // No specific setup needed
+
+        // When & Then
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> ContextMapperGenerator.byName("just a string"))
+                .withMessageContaining(
+                        "No generator found for the name 'just a string'. Valid values are: context-map, plantuml, generic");
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"CONTEXT_MAP", "PLANT_UML", "GENERIC"})
+    @ValueSource(strings = { "CONTEXT_MAP", "PLANT_UML", "GENERIC" })
     void getGenerator_WhenCalled_ThenReturnGeneratorImplementation(final String enumValueAsString) {
-        // given
+        // Given
         final ContextMapperGenerator generator = ContextMapperGenerator.valueOf(enumValueAsString);
 
-        // when
+        // When
         final IGenerator2 generatorImpl = generator.getGenerator();
 
-        // then
+        // Then
         assertThat(generatorImpl).isNotNull();
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "CONTEXT_MAP, context-map (Graphical DDD Context Map)",
+            "PLANT_UML, plantuml (PlantUML class-, component-, and state diagrams.)",
+            "GENERIC, generic (Generate generic text with Freemarker template)"
+    })
+    void getDisplayName_ReturnsCorrectFormat(ContextMapperGenerator generator, String expectedDisplayName) {
+        // Given
+        // generator and expectedDisplayName are provided by @CsvSource
+
+        // When
+        String displayName = generator.getDisplayName();
+
+        // Then
+        assertThat(displayName).contains(expectedDisplayName);
+    }
 }

@@ -1,37 +1,15 @@
-/*
- * Copyright 2021 The Context Mapper Project Team
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.contextmapper.cli;
 
-import org.contextmapper.cli.commands.GenerateCommand;
-import org.contextmapper.cli.commands.ValidateCommand;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.DisplayName;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
 class ContextMapperCLITest {
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
@@ -39,99 +17,104 @@ class ContextMapperCLITest {
     private final PrintStream originalOut = System.out;
     private final PrintStream originalErr = System.err;
 
-    @Mock
-    private ValidateCommand validateCommand;
-
-    @Mock
-    private GenerateCommand generateCommand;
-
-    @InjectMocks
-    private ContextMapperCLI contextMapperCLI;
-
     @BeforeEach
-    public void setUpStreams() {
+    void setUp() {
         System.setOut(new PrintStream(outContent));
         System.setErr(new PrintStream(errContent));
     }
 
     @AfterEach
-    public void restoreStreams() {
+    void restoreStreams() {
         System.setOut(originalOut);
         System.setErr(originalErr);
     }
 
     @Test
-    void main_WhenCalledWithoutCommand_ThenPrintUsage() {
-        // given
-        final String[] params = new String[]{};
+    @DisplayName("main() should print top-level help when called without command")
+    void main_WhenCalledWithoutCommand_ThenPrintsTopLevelHelp() {
+        // Given
+        // No arguments for this test case
 
-        // when
-        ContextMapperCLI.main(params);
+        // When
+        ContextMapperCLI.runCLI(new String[0]);
 
-        // then
-        assertThat(outContent.toString()).isEqualTo("Context Mapper CLI DEVELOPMENT VERSION" + System.lineSeparator() +
-                "Usage: cm validate|generate [options]" + System.lineSeparator());
+        // Then
+        assertThat(outContent.toString()).contains("Context Mapper CLI. Use 'cm --help' for usage information.");
     }
 
     @Test
-    void run_WhenCalledWithoutCommand_ThenPrintUsage() {
-        // given
-        final String[] params = new String[]{};
+    @DisplayName("main() should print top-level help when called with --help option")
+    void main_WhenCalledWithHelpOption_ThenPrintsTopLevelHelp() {
+        // Given
+        String[] args = { "--help" };
 
-        // when
-        contextMapperCLI.run(params);
+        // When
+        int exitCode = ContextMapperCLI.runCLI(args);
 
-        // then
-        assertThat(outContent.toString()).isEqualTo("Context Mapper CLI DEVELOPMENT VERSION" + System.lineSeparator() +
-                "Usage: cm validate|generate [options]" + System.lineSeparator());
+        // Then
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(outContent.toString())
+                .contains("Usage: cm [-hV] [COMMAND]")
+                .contains("Commands:")
+                .contains("validate  Validates a CML file.")
+                .contains("generate  Generates output from a CML file.");
     }
 
     @Test
-    void run_WhenCalledWithValidate_ThenCallValidateCommand() {
-        // given
-        final String[] params = new String[]{"validate"};
+    @DisplayName("main() should print version when called with --version option")
+    void main_WhenCalledWithVersionOption_ThenPrintsVersion() {
+        // Given
+        String[] args = { "--version" };
 
-        // when
-        contextMapperCLI.run(params);
+        // When
+        int exitCode = ContextMapperCLI.runCLI(args);
 
-        // then
-        verify(validateCommand).run(new String[]{});
+        // Then
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(outContent.toString().trim()).isEqualTo("Context Mapper CLI DEVELOPMENT VERSION");
     }
 
     @Test
-    void run_WhenCalledWithValidateAndAdditionalParams_ThenCallValidateCommandWithParams() {
-        // given
-        final String[] params = new String[]{"validate", "test-param"};
+    @DisplayName("main() should print version when called with -V option")
+    void main_WhenCalledWithShortVersionOption_ThenPrintsVersion() {
+        // Given
+        String[] args = { "-V" };
 
-        // when
-        contextMapperCLI.run(params);
+        // When
+        int exitCode = ContextMapperCLI.runCLI(args);
 
-        // then
-        verify(validateCommand).run(new String[]{"test-param"});
+        // Then
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(outContent.toString().trim()).isEqualTo("Context Mapper CLI DEVELOPMENT VERSION");
     }
 
     @Test
-    void run_WhenCalledWithGenerate_ThenCallGenerateCommand() {
-        // given
-        final String[] params = new String[]{"generate"};
+    @DisplayName("main() should print error and usage when called with an invalid option")
+    void main_WhenCalledWithInvalidOption_ThenPrintsErrorAndUsage() {
+        // Given
+        String[] args = { "--invalid-option" };
 
-        // when
-        contextMapperCLI.run(params);
+        // When
+        int exitCode = ContextMapperCLI.runCLI(args);
 
-        // then
-        verify(generateCommand).run(new String[]{});
+        // Then
+        assertThat(exitCode).isNotEqualTo(0);
+        assertThat(errContent.toString())
+                .contains("Unknown option: '--invalid-option'")
+                .contains("Usage: cm [-hV] [COMMAND]");
     }
 
     @Test
-    void run_WhenCalledWithGenerateAndAdditionalParams_ThenCallGenerateCommandWithParams() {
-        // given
-        final String[] params = new String[]{"generate", "plantuml"};
+    @DisplayName("main() should print error and usage when called with an invalid subcommand")
+    void main_WhenCalledWithInvalidSubcommand_ThenPrintsErrorAndUsage() {
+        // Given
+        String[] args = { "invalid-command" };
 
-        // when
-        contextMapperCLI.run(params);
+        // When
+        int exitCode = ContextMapperCLI.runCLI(args);
 
-        // then
-        verify(generateCommand).run(new String[]{"plantuml"});
+        // Then
+        assertThat(exitCode).isNotEqualTo(0);
+        assertThat(errContent.toString()).contains("Unmatched argument at index 0: 'invalid-command'");
     }
-
 }
