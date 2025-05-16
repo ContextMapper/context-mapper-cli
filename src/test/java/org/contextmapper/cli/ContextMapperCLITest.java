@@ -4,7 +4,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import picocli.CommandLine;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -17,13 +16,11 @@ class ContextMapperCLITest {
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
     private final PrintStream originalErr = System.err;
-    private CommandLine cmd;
 
     @BeforeEach
     void setUp() {
         System.setOut(new PrintStream(outContent));
         System.setErr(new PrintStream(errContent));
-        cmd = new CommandLine(new ContextMapperCLI());
     }
 
     @AfterEach
@@ -39,7 +36,7 @@ class ContextMapperCLITest {
         // No arguments for this test case
 
         // When
-        cmd.execute();
+        ContextMapperCLI.runCLI(new String[0]);
 
         // Then
         assertThat(outContent.toString()).contains("Context Mapper CLI. Use 'cm --help' for usage information.");
@@ -52,7 +49,7 @@ class ContextMapperCLITest {
         String[] args = { "--help" };
 
         // When
-        int exitCode = cmd.execute(args);
+        int exitCode = ContextMapperCLI.runCLI(args);
 
         // Then
         assertThat(exitCode).isEqualTo(0);
@@ -70,11 +67,25 @@ class ContextMapperCLITest {
         String[] args = { "--version" };
 
         // When
-        int exitCode = cmd.execute(args);
+        int exitCode = ContextMapperCLI.runCLI(args);
 
         // Then
         assertThat(exitCode).isEqualTo(0);
-        assertThat(outContent.toString()).contains("Context Mapper CLI");
+        assertThat(outContent.toString().trim()).isEqualTo("Context Mapper CLI DEVELOPMENT VERSION");
+    }
+
+    @Test
+    @DisplayName("main() should print version when called with -V option")
+    void main_WhenCalledWithShortVersionOption_ThenPrintsVersion() {
+        // Given
+        String[] args = { "-V" };
+
+        // When
+        int exitCode = ContextMapperCLI.runCLI(args);
+
+        // Then
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(outContent.toString().trim()).isEqualTo("Context Mapper CLI DEVELOPMENT VERSION");
     }
 
     @Test
@@ -84,7 +95,7 @@ class ContextMapperCLITest {
         String[] args = { "--invalid-option" };
 
         // When
-        int exitCode = cmd.execute(args);
+        int exitCode = ContextMapperCLI.runCLI(args);
 
         // Then
         assertThat(exitCode).isNotEqualTo(0);
@@ -100,7 +111,7 @@ class ContextMapperCLITest {
         String[] args = { "invalid-command" };
 
         // When
-        int exitCode = cmd.execute(args);
+        int exitCode = ContextMapperCLI.runCLI(args);
 
         // Then
         assertThat(exitCode).isNotEqualTo(0);

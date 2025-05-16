@@ -23,9 +23,12 @@ public class ContextMapperCLI implements Runnable {
         System.out.println("Context Mapper CLI. Use 'cm --help' for usage information.");
     }
 
+    public static int runCLI(String[] args) {
+        return new CommandLine(new ContextMapperCLI()).execute(args);
+    }
+
     public static void main(String[] args) {
-        CommandLine commandLine = new CommandLine(new ContextMapperCLI());
-        int exitCode = commandLine.execute(args);
+        int exitCode = runCLI(args);
         System.exit(exitCode);
     }
 }
