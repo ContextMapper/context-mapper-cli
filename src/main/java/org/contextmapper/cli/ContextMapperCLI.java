@@ -1,7 +1,5 @@
 package org.contextmapper.cli;
 
-import org.contextmapper.cli.commands.GenerateCommand;
-import org.contextmapper.cli.commands.ValidateCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 

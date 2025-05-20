@@ -1,16 +1,15 @@
-package org.contextmapper.cli.commands;
-
-import org.contextmapper.cli.ContextMapperCLI;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import picocli.CommandLine;
+package org.contextmapper.cli;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import picocli.CommandLine;
 
 class ValidateCommandTest {
 

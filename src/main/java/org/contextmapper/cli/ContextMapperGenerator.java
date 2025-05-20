@@ -1,13 +1,13 @@
-package org.contextmapper.cli.commands;
+package org.contextmapper.cli;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.contextmapper.dsl.generator.ContextMapGenerator;
 import org.contextmapper.dsl.generator.GenericContentGenerator;
 import org.contextmapper.dsl.generator.PlantUMLGenerator;
 import org.eclipse.xtext.generator.IGenerator2;
-
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public enum ContextMapperGenerator {
 

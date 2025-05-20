@@ -1,16 +1,17 @@
-package org.contextmapper.cli.commands;
+package org.contextmapper.cli;
+
+import java.io.File;
+import java.util.Objects;
+import java.util.concurrent.Callable;
 
 import org.contextmapper.dsl.cml.CMLResource;
 import org.contextmapper.dsl.generator.GenericContentGenerator;
 import org.contextmapper.dsl.standalone.ContextMapperStandaloneSetup;
 import org.contextmapper.dsl.standalone.StandaloneContextMapperAPI;
 import org.eclipse.xtext.generator.IGenerator2;
+
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-
-import java.io.File;
-import java.util.Objects;
-import java.util.concurrent.Callable;
 
 @Command(
     name = "generate",

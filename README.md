@@ -89,7 +89,9 @@ The following examples illustrate the CLI usage.
 If you want to contribute to this project you can create a fork and a pull request. The project is built with Gradle, so you can import it as Gradle project within Eclipse or IntelliJ IDEA (or any other IDE supporting Gradle).
 
 ```bash
+# Use sdkman or install manually JDK 17
 sdk env install
+
 ./gradlew clean build
 ./gradlew clean build jacocoTestReport
 jwebserver -p 9000 -d "$(pwd)/build/reports/"
