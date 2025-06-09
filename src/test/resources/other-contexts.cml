@@ -1,0 +1,3 @@
+/* Simple bounded contexts */
+BoundedContext anotherContext
+BoundedContext yetAnotherContext 
