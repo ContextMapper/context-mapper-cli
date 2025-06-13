@@ -1,4 +1,8 @@
-package org.contextmapper.cli.commands;
+package org.contextmapper.cli;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.contextmapper.dsl.generator.ContextMapGenerator;
 import org.contextmapper.dsl.generator.GenericContentGenerator;
@@ -27,29 +31,33 @@ public enum ContextMapperGenerator {
         return description;
     }
 
-    @Override
-    public String toString() {
+    public String getDisplayName() {
         return this.name + " (" + this.description + ")";
     }
 
+    @Override
+    public String toString() {
+        return this.name;
+    }
+
     public static ContextMapperGenerator byName(String name) {
-        if (name == null || "".equals(name))
+        // Preconditions check
+        if (Objects.isNull(name) || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Please provide a name for the generator.");
-
-        for (ContextMapperGenerator generator : values()) {
-            if (generator.getName().equals(name))
-                return generator;
         }
-
-        throw new IllegalArgumentException("No generator found for the name '" + name + "'.");
+        return Arrays.stream(values())
+                .filter(gen -> gen.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No generator found for the name '" + name +
+                        "'. Valid values are: " +
+                        Arrays.stream(values()).map(ContextMapperGenerator::getName).collect(Collectors.joining(", "))));
     }
 
     public IGenerator2 getGenerator() {
-        if (this == CONTEXT_MAP)
-            return new ContextMapGenerator();
-        if (this == PLANT_UML)
-            return new PlantUMLGenerator();
-        return new GenericContentGenerator();
+        return switch (this) {
+            case CONTEXT_MAP -> new ContextMapGenerator();
+            case PLANT_UML -> new PlantUMLGenerator();
+            case GENERIC -> new GenericContentGenerator();
+        };
     }
-
 }

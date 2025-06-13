@@ -7,34 +7,38 @@ plugins {
     id 'nebula.release' version '19.0.10'
 }
 
-group 'org.contextmapper'
+group = 'org.contextmapper'
 
-sourceCompatibility = '11'
-targetCompatibility = '11'
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation "commons-cli:commons-cli:${commonsCliVersion}"
     implementation "org.contextmapper:context-mapper-dsl:${cmlVersion}"
+    implementation "info.picocli:picocli:${picocliVersion}"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${jUnitVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-params:${jUnitVersion}"
     testImplementation "org.assertj:assertj-core:${assertJVersion}"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}"
 }
 
 application {
-    mainClassName = 'org.contextmapper.cli.ContextMapperCLI'
-    applicationName = 'context-mapper-cli'
-}
-startScripts {
+    mainClass = 'org.contextmapper.cli.ContextMapperCLI'
     applicationName = 'cm'
 }
+
+javadoc {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    failOnError false
+}
+
 jar {
     manifest {
         attributes (
@@ -43,6 +47,12 @@ jar {
                 'Main-Class': 'org.contextmapper.cli.ContextMapperCLI'
         )
     }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude('META-INF/LICENSE.txt', 'META-INF/NOTICE.txt', 'META-INF/DEPENDENCIES')
+    exclude('META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/services/**')
 }
 
 if (!project.hasProperty('signing.secretKeyRingFile')) {
@@ -50,14 +60,12 @@ if (!project.hasProperty('signing.secretKeyRingFile')) {
 }
 
 test {
-    useJUnitPlatform()
-
     testLogging {
-        showExceptions true
-        exceptionFormat "full"
+        showExceptions = true
+        exceptionFormat = "full"
 
-        showCauses true
-        showStackTraces true
+        showCauses = true
+        showStackTraces = true
     }
 }
 
@@ -146,14 +154,22 @@ signing {
     sign(publishing.publications)
 }
 
+testing {
+    suites {
+        test(JvmTestSuite) {
+            useJUnitJupiter(jUnitVersion)
+        }
+    }
+}
+
 tasks.withType(GenerateModuleMetadata) {
     enabled = false
 }
 
-tasks.withType(CreateStartScripts).each { task ->
-    task.doLast {
-        String text = task.windowsScript.text
+tasks.withType(CreateStartScripts).configureEach {
+    doLast {
+        String text = windowsScript.text
         text = text.replaceFirst(/(set CLASSPATH=%APP_HOME%\\lib\\).*/, { "${it[1]}*" })
-        task.windowsScript.write text
+        windowsScript.text = text
     }
 }

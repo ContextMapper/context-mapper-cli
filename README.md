@@ -89,7 +89,14 @@ The following examples illustrate the CLI usage.
 If you want to contribute to this project you can create a fork and a pull request. The project is built with Gradle, so you can import it as Gradle project within Eclipse or IntelliJ IDEA (or any other IDE supporting Gradle).
 
 ```bash
+# Use sdkman or install manually JDK 17
+sdk env install
+
 ./gradlew clean build
+./gradlew clean build jacocoTestReport
+jwebserver -p 9000 -d "$(pwd)/build/reports/"
+./gradlew clean build snapshot
+java -jar build/libs/context-mapper-cli-0.1.0-SNAPSHOT.jar
 ```
 
 ## Contributing
@@ -100,4 +107,3 @@ Contribution is always welcome! Here are some ways how you can contribute:
 
 ## Licence
 ContextMapper is released under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
-
